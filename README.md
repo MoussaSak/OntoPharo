@@ -1,5 +1,4 @@
 # OntoPharo
-# OntoPharo
 
 Intelligent assistant for Pharo.
 
