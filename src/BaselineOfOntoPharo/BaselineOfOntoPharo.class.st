@@ -22,7 +22,7 @@ BaselineOfOntoPharo >> baseline: spec [
 
 { #category : #'as yet unclassified' }
 BaselineOfOntoPharo >> loadIdentifierNameSplitter: spec [
-	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [ 
+	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
 		spec
 			baseline: 'IdentifierNameSplitter'
 			with: [ spec repository: 'github://olekscode/IdentifierNameSplitter/src' ] ]
@@ -30,7 +30,7 @@ BaselineOfOntoPharo >> loadIdentifierNameSplitter: spec [
 
 { #category : #'as yet unclassified' }
 BaselineOfOntoPharo >> loadPolyglot: spec [
-	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [ 
+	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
 		spec
 			baseline: 'Polyglot'
 			with: [ spec repository: 'github://PolyMathOrg/Polyglot/src' ] ]
