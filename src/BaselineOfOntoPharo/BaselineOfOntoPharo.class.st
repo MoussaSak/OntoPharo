@@ -4,7 +4,7 @@ Baseline of Ontologue Project
 Class {
 	#name : #BaselineOfOntoPharo,
 	#superclass : #Object,
-	#category : 'BaselineOfOntoPharo'
+	#category : #BaselineOfOntoPharo
 }
 
 { #category : #baselines }
@@ -17,7 +17,7 @@ BaselineOfOntoPharo >> baseline: spec [
 		spec
 			package: 'OntoPharo';
 			package: 'OntoPharo-Tests'
-			with: [ spec requires: #( 'OntoPharo' ) ] ]
+			with: [ spec requires: #(OntoPharo) ] ]
 ]
 
 { #category : #'as yet unclassified' }
