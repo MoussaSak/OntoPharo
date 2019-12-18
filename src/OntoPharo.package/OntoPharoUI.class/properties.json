@@ -1,0 +1,15 @@
+{
+	"commentStamp" : "",
+	"super" : "SpPresenter",
+	"category" : "OntoPharo-UI",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"notebook",
+		"checkbox",
+		"dynamicPage"
+	],
+	"name" : "OntoPharoUI",
+	"type" : "normal"
+}

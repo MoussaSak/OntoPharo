@@ -1,0 +1,13 @@
+{
+	"commentStamp" : "",
+	"super" : "Object",
+	"category" : "OntoPharo-Name-Filtrer",
+	"classinstvars" : [ ],
+	"pools" : [ ],
+	"classvars" : [ ],
+	"instvars" : [
+		"tfidf"
+	],
+	"name" : "TermsFeatureSelector",
+	"type" : "normal"
+}
