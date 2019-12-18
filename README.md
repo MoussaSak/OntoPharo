@@ -1,6 +1,10 @@
 # OntoPharo
 
+<<<<<<< HEAD
 A Pharo intelligent assistant.
+=======
+Intelligent assistant for Pharo.
+>>>>>>> 638b68756c20566009d6b91667a7132d502c3279
 
 ## Installation 
 
