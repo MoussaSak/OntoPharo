@@ -16,6 +16,8 @@ BaselineOfOntoPharo >> baseline: spec [
 		"Packages"
 		spec
 			package: 'OntoPharo';
+			package: 'OntoPharo-Name-Filtrer' with: [ spec requires: #(OntoPharo) ] ;
+			package: 'OntoPharo-UI' with: [ spec requires: #(OntoPharo) ] ;
 			package: 'OntoPharo-Tests'
 			with: [ spec requires: #(OntoPharo) ] ]
 ]
