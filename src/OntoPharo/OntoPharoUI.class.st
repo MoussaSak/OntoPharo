@@ -4,87 +4,86 @@ Class {
 	#instVars : [
 		'notebook',
 		'checkbox',
-		'dynamicPage'
+		'dynamicPage',
+		'conceptListPresenter',
+		'classListPresenter',
+		'suggestionPresenter',
+		'tfs'
 	],
-	#category : 'OntoPharo-UI'
+	#category : #'OntoPharo-UI'
 }
 
 { #category : #specs }
 OntoPharoUI class >> defaultSpec [
-	^ SpBoxLayout newVertical
-		  add: #notebook;
-		  add: (SpBoxLayout newHorizontal
-				   add: #checkbox
-				   withConstraints: [ :constraints | constraints width: 20 ];
-				   add: 'Show dynamic presenter')
-		  withConstraints: [ :constraints | 
-		  constraints height: self labelHeight ];
-		  yourself
+	^ SpPanedLayout newVertical
+		add:
+			(SpPanedLayout newHorizontal
+				add: #classListPresenter;
+				add: #conceptListPresenter;
+				yourself);
+		add: #suggestionPresenter ;
+		yourself
 ]
 
 { #category : #specs }
-OntoPharoUI class >> run [
+OntoPharoUI class >> open [
 	<script>
-	self new openWithSpec
+	"self new openWithSpec"
+	|example|
+	example := OntoPharoUI new.
+	example 
+	classes: self environment allClasses ;
+	openWithSpec. 
+	^ example 
+	
 ]
 
-{ #category : #pages }
-OntoPharoUI >> browserPage [
-	^ SpNotebookPage
-		  title: 'Browser'
-		  icon: (self iconNamed: #nautilusIcon)
-		  provider: [ 
-			  SpClassMethodBrowser new
-				  classes: self class environment allClasses;
-				  yourself ] 
+{ #category : #specs }
+OntoPharoUI class >> title [ 
+	^'OntoPharo'
+]
+
+{ #category : #accessing }
+OntoPharoUI >> classes: aList [
+	classListPresenter items = aList
+		ifTrue: [ ^ self ].
+	classListPresenter
+		items: aList;
+		selectIndex: 1
 ]
 
 { #category : #initialization }
-OntoPharoUI >> connectPresenters [ 
+OntoPharoUI >> connectPresenters [
 	super connectPresenters.
-
-	checkbox whenActivatedDo: [ notebook addPage: (dynamicPage := self dynamicPage) ].
-
-	checkbox
-		whenDeactivatedDo: [ dynamicPage
-				ifNotNil: [ :page | 
-					notebook removePage: page.
-					dynamicPage := nil ] ]
-
+	classListPresenter
+		transmitTo: conceptListPresenter
+		transform: self extractConcepts
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	conceptListPresenter
+		transmitTo: suggestionPresenter
+		transform: self proposeSuggestions
+		postTransmission: [ :destination | destination selectIndex: 1 ]
 ]
 
-{ #category : #pages }
-OntoPharoUI >> dynamicPage [ 
-	^ SpNotebookPage title: 'Dynamic' icon: (self iconNamed: #nautilusIcon) provider: [ SpDynamicWidgetChange new ]
-
+{ #category : #initialization }
+OntoPharoUI >> extractConcepts [
+	^ [ :class | (tfs splitClassName: class getName asString) ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> initializePresenters [
-	notebook := self newNotebook.
-	checkbox := self newCheckBox.
-	notebook
-		addPage: self objectClassPage;
-		addPage: self objectInspectorPage;
-		addPage: self browserPage
+	tfs := TermsFeatureSelector new.
+	classListPresenter := self newList.
+	conceptListPresenter := self newList.
+	suggestionPresenter := self newList.
+	
+	self focusOrder
+		add: classListPresenter;
+		add: conceptListPresenter;
+		add: suggestionPresenter
 ]
 
-{ #category : #pages }
-OntoPharoUI >> objectClassPage [ 
-	^ SpNotebookPage title: 'Object class' icon: (self iconNamed: #nautilusIcon) provider: [ MessageBrowser new messages: Object methods ]
-
-
-
-]
-
-{ #category : #pages }
-OntoPharoUI >> objectInspectorPage [ 
-	^ SpNotebookPage
-		title: 'Object inspector'
-		icon: (self iconNamed: #nautilusIcon)
-		provider: [ EyeInspector new
-				inspect: Object;
-				yourself ]
-		layoutSpec: #inspectorSpec
-
+{ #category : #initialization }
+OntoPharoUI >> proposeSuggestions [
+	^ [ :x | #(1 2 3) ]
 ]

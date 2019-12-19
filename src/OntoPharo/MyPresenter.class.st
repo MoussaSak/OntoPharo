@@ -6,7 +6,7 @@ Class {
 		'button',
 		'table'
 	],
-	#category : 'OntoPharo-UI'
+	#category : #'OntoPharo-UI'
 }
 
 { #category : #specs }
@@ -29,17 +29,18 @@ MyPresenter class >> open [
 
 { #category : #specs }
 MyPresenter class >> title [
-	^ 'Ontologue'
+	^ 'OntoPharo'
 ]
 
 { #category : #initialization }
 MyPresenter >> initializeWidgets [
 	label := SpLabelPresenter new.
-	button := SpButtonPresenter new action: [ table items: { 5 } ]; label: 'Set'.
+	button := SpButtonPresenter new
+		action: [ table items: {5 . 2 . 5. 6. 1. 1} ];
+		label: 'Set'.
 	table := SpTablePresenter new
-		         items: { 1. 2. 4 };
-		         addColumn:
-			         (SpStringTableColumn new evaluated: [ :int | int asString ]);
-		         whenSelectionChangedDo: [ :selection | selection inspect ];
-		         yourself
+		items: {1 . 2 . 4};
+		addColumn: (SpStringTableColumn new evaluated: [ :int | int asString ]);
+		whenSelectionChangedDo: [ :selection | selection inspect ];
+		yourself
 ]
