@@ -3,7 +3,7 @@ Baseline of Ontologue Project
 "
 Class {
 	#name : #BaselineOfOntoPharo,
-	#superclass : #Object,
+	#superclass : #BaselineOf,
 	#category : #BaselineOfOntoPharo
 }
 
