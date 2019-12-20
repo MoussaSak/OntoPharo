@@ -2,13 +2,13 @@ Class {
 	#name : #OntoPharoUI,
 	#superclass : #SpPresenter,
 	#instVars : [
-		'notebook',
-		'checkbox',
 		'dynamicPage',
 		'conceptListPresenter',
 		'classListPresenter',
 		'suggestionPresenter',
-		'tfs'
+		'tfs',
+		'button',
+		'aPackage'
 	],
 	#category : #'OntoPharo-UI'
 }
@@ -21,21 +21,26 @@ OntoPharoUI class >> defaultSpec [
 				add: #classListPresenter;
 				add: #conceptListPresenter;
 				yourself);
-		add: #suggestionPresenter ;
-		yourself
+		add:
+			(SpBoxLayout newHorizontal
+				add: #suggestionPresenter;
+				add: #button;
+				yourself);
+	
+			yourself
 ]
 
 { #category : #specs }
 OntoPharoUI class >> open [
-	<script>
 	"self new openWithSpec"
-	|example|
+
+	<script>
+	| example |
 	example := OntoPharoUI new.
-	example 
-	classes: self environment allClasses ;
-	openWithSpec. 
-	^ example 
-	
+	example
+		classes: self environment allClasses;
+		openWithSpec.
+	^ example
 ]
 
 { #category : #specs }
@@ -59,15 +64,20 @@ OntoPharoUI >> connectPresenters [
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-	conceptListPresenter
-		transmitTo: suggestionPresenter
-		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ]
+	button
+		action: [ conceptListPresenter
+				transmitTo: suggestionPresenter
+				transform: self proposeSuggestions
+				postTransmission: [ :destination | destination selectIndex: 1 ].
+			 ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractConcepts [
-	^ [ :class | (tfs splitClassName: class getName asString) ]
+	^ [ :aClass | 
+	aPackage := aClass class package name.
+	
+	tfs splitClassName: aClass getName asString ]
 ]
 
 { #category : #initialization }
@@ -76,14 +86,19 @@ OntoPharoUI >> initializePresenters [
 	classListPresenter := self newList.
 	conceptListPresenter := self newList.
 	suggestionPresenter := self newList.
-	
+	button := self newButton
+		label: 'Propose Suggestions'.
 	self focusOrder
 		add: classListPresenter;
 		add: conceptListPresenter;
-		add: suggestionPresenter
+		add: suggestionPresenter;
+		add: button
 ]
 
 { #category : #initialization }
 OntoPharoUI >> proposeSuggestions [
-	^ [ :x | #(1 2 3) ]
+	
+	
+	^ [ :aConcept |  
+		(tfs sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage) orderedKeys ]
 ]

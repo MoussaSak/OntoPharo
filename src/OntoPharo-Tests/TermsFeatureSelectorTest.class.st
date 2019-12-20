@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'tfs'
 	],
-	#category : 'OntoPharo-Tests'
+	#category : #'OntoPharo-Tests-Name-Filtrer'
 }
 
 { #category : #running }

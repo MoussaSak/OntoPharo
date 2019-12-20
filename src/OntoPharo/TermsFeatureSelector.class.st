@@ -2,10 +2,20 @@ Class {
 	#name : #TermsFeatureSelector,
 	#superclass : #Object,
 	#instVars : [
-		'tfidf'
+		'tfidf',
+		'termsMeasurments'
 	],
-	#category : 'OntoPharo-Name-Filtrer'
+	#category : #'OntoPharo-Name-Filtrer'
 }
+
+{ #category : #sorting }
+TermsFeatureSelector >> collectAllConcepts: aPackage [ 
+| collection conceptsCollection |
+collection := OrderedCollection new.
+conceptsCollection :=  (self splitAllPackageClassesNames: aPackage) .
+conceptsCollection collect: [:i| i collect: [ :x| collection add: (x asString) ]  ] .
+^collection 
+]
 
 { #category : #'as yet unclassified' }
 TermsFeatureSelector >> getConceptTFIDF: aConcept in: aDocument [
@@ -24,32 +34,69 @@ TermsFeatureSelector >> getPackageAllClassesNames: aPackageName [
 
 { #category : #initialization }
 TermsFeatureSelector >> initialize [
-	tfidf := PGTermFrequencyInverseDocumentFrequency new.	
-	^super initialize.
-	
+	tfidf := PGTermFrequencyInverseDocumentFrequency new.
+	termsMeasurments := TermsMeasurements new.
+	^ super initialize
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #sorting }
+TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept  in:  aPackage [ 
+	
+| aPackageConcepsCollection levenshteinCollection dictionary |
+	aPackageConcepsCollection := OrderedCollection new.
+	levenshteinCollection := OrderedCollection new.
+	aPackageConcepsCollection := self collectAllConcepts: aPackage .
+	
+	levenshteinCollection := aPackageConcepsCollection
+		collect:
+			[ :anotherConcept | termsMeasurments hammingDistanceOf: aConcept  with: anotherConcept  ].
+	dictionary := OrderedDictionary
+		newFromKeys: aPackageConcepsCollection
+		andValues: levenshteinCollection.
+	^ dictionary sort
+]
+
+{ #category : #sorting }
+TermsFeatureSelector >> sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
+	| aPackageConcepsCollection levenshteinCollection dictionary |
+	aPackageConcepsCollection := OrderedCollection new.
+	levenshteinCollection := OrderedCollection new.
+	aPackageConcepsCollection := self collectAllConcepts: aPackage .
+	
+	levenshteinCollection := aPackageConcepsCollection
+		collect:
+			[ :anotherConcept | termsMeasurments levenshteinDistanceOf: aConcept With: anotherConcept ].
+	dictionary := OrderedDictionary
+		newFromKeys: aPackageConcepsCollection
+		andValues: levenshteinCollection.
+	^ dictionary sort
+]
+
+{ #category : #sorting }
 TermsFeatureSelector >> sortConceptsByTFIDF: aCollection [
 	^ aCollection asSortedCollection 
 ]
 
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> splitAllPackageClassesNames: aPackageName [
-	| aPackageAllClassesNames allClassesNamesAsCollection |
-	aPackageAllClassesNames := self getPackageAllClassesNames:
-		                           aPackageName.
-	allClassesNamesAsCollection := aPackageAllClassesNames collect: [ 
-		                               :className | 
-		                               self splitClassName: className ].
-	^ (allClassesNamesAsCollection collect: [ :e | 
-		   (e collect: #asSymbol) asArray ]) asArray
+	| aPackageAllClassesNames |
+	aPackageAllClassesNames := self getPackageAllClassesNames: aPackageName.
+	^ aPackageAllClassesNames collect: [ :className | (self splitClassName: className) ]
+	"^ allClassesNamesAsCollection collect: [ :e | e collect: #asSymbol ]"
 ]
 
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> splitClassName: aClasseName [
 
 	^aClasseName splitIdentifierName.
+]
+
+{ #category : #'as yet unclassified' }
+TermsFeatureSelector >> suggestConceptNames: aConcept in: aPackage [
+	self trainOn: (self splitAllPackageClassesNames: aPackage).
+	^ self
+		getConceptTFIDF: aConcept
+		in: (('A Test from the first example' splitOn: ' ') asArray) 
 ]
 
 { #category : #'as yet unclassified' }
