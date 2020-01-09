@@ -8,7 +8,7 @@ To install `OntoPharo`, go to the Playground (Ctrl+OW) in your Pharo image and e
 ```smalltalk
 Metacello new
   baseline: 'OntoPharo';
-  repository: 'github.com/MoussaSak/OntoPharo/src';
+  repository: 'github://MoussaSak/OntoPharo';
   load.
 ```
 
