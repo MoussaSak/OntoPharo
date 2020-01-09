@@ -10,16 +10,15 @@ Class {
 { #category : #baselines }
 BaselineOfOntoPharo >> baseline: spec [
 	<baseline>
-	spec for: #common do: [ "dependencies"
-		self loadPolyglot: spec.
-		self loadIdentifierNameSplitter: spec.
-		"Packages"
-		spec
-			package: 'OntoPharo';
-			package: 'OntoPharo-Name-Filtrer' with: [ spec requires: #(OntoPharo) ] ;
-			package: 'OntoPharo-UI' with: [ spec requires: #(OntoPharo) ] ;
-			package: 'OntoPharo-Tests'
-			with: [ spec requires: #(OntoPharo) ] ]
+	spec
+		for: #common
+		do: [ "dependencies"
+			self loadPolyglot: spec.
+			self loadIdentifierNameSplitter: spec.
+			"Packages"
+			spec
+				package: 'OntoPharo';
+				package: 'OntoPharo-Tests' with: [ spec requires: #(OntoPharo) ] ]
 ]
 
 { #category : #'as yet unclassified' }

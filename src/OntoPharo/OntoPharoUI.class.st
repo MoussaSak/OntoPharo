@@ -24,7 +24,7 @@ OntoPharoUI class >> defaultSpec [
 		add:
 			(SpBoxLayout newHorizontal
 				add: #suggestionPresenter;
-				add: #button;
+				"add: #button;"
 				yourself);
 	
 			yourself
@@ -64,12 +64,13 @@ OntoPharoUI >> connectPresenters [
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-	button
-		action: [ conceptListPresenter
-				transmitTo: suggestionPresenter
-				transform: self proposeSuggestions
-				postTransmission: [ :destination | destination selectIndex: 1 ].
-			 ]
+	"button
+		action: ["
+	conceptListPresenter
+		transmitTo: suggestionPresenter
+		transform: self proposeSuggestions
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	"]"
 ]
 
 { #category : #initialization }
@@ -85,9 +86,8 @@ OntoPharoUI >> initializePresenters [
 	tfs := TermsFeatureSelector new.
 	classListPresenter := self newList.
 	conceptListPresenter := self newList.
-	suggestionPresenter := self newList.
-	button := self newButton
-		label: 'Propose Suggestions'.
+	suggestionPresenter := self newList .
+	button := self newButton label: 'Propose Suggestions'.
 	self focusOrder
 		add: classListPresenter;
 		add: conceptListPresenter;
@@ -97,8 +97,7 @@ OntoPharoUI >> initializePresenters [
 
 { #category : #initialization }
 OntoPharoUI >> proposeSuggestions [
-	
-	
-	^ [ :aConcept |  
-		(tfs sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage) orderedKeys ]
+	^ [ :aConcept | 
+	(tfs sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
+		orderedKeys ]
 ]

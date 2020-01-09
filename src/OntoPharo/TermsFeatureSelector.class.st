@@ -40,19 +40,19 @@ TermsFeatureSelector >> initialize [
 ]
 
 { #category : #sorting }
-TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept  in:  aPackage [ 
-	
-| aPackageConcepsCollection levenshteinCollection dictionary |
+TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
+	| aPackageConcepsCollection hammingCollection dictionary |
 	aPackageConcepsCollection := OrderedCollection new.
-	levenshteinCollection := OrderedCollection new.
-	aPackageConcepsCollection := self collectAllConcepts: aPackage .
-	
-	levenshteinCollection := aPackageConcepsCollection
-		collect:
-			[ :anotherConcept | termsMeasurments hammingDistanceOf: aConcept  with: anotherConcept  ].
+	hammingCollection := OrderedCollection new.
+	aPackageConcepsCollection := self collectAllConcepts: aPackage.
+	hammingCollection := aPackageConcepsCollection
+		collect: [ :anotherConcept | 
+			aConcept size = anotherConcept size
+				ifTrue: [ termsMeasurments hammingDistanceOf: aConcept with: anotherConcept ]
+				ifFalse: [ 6 ] ].
 	dictionary := OrderedDictionary
 		newFromKeys: aPackageConcepsCollection
-		andValues: levenshteinCollection.
+		andValues: hammingCollection.
 	^ dictionary sort
 ]
 
