@@ -17,6 +17,13 @@ conceptsCollection collect: [:i| i collect: [ :x| collection add: (x asString) ]
 ^collection 
 ]
 
+{ #category : #initialization }
+TermsFeatureSelector >> foo [ 
+	"self new foo"
+	
+	^ super == self 
+]
+
 { #category : #'as yet unclassified' }
 TermsFeatureSelector >> getConceptTFIDF: aConcept in: aDocument [
 	
@@ -34,9 +41,10 @@ TermsFeatureSelector >> getPackageAllClassesNames: aPackageName [
 
 { #category : #initialization }
 TermsFeatureSelector >> initialize [
+	super initialize.
 	tfidf := PGTermFrequencyInverseDocumentFrequency new.
 	termsMeasurments := TermsMeasurements new.
-	^ super initialize
+
 ]
 
 { #category : #sorting }
@@ -65,7 +73,7 @@ TermsFeatureSelector >> sortConceptsByLevenshteinDistanceOf: aConcept in: aPacka
 	
 	levenshteinCollection := aPackageConcepsCollection
 		collect:
-			[ :anotherConcept | termsMeasurments levenshteinDistanceOf: aConcept With: anotherConcept ].
+			[ :anotherConcept | termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept ].
 	dictionary := OrderedDictionary
 		newFromKeys: aPackageConcepsCollection
 		andValues: levenshteinCollection.

@@ -13,26 +13,16 @@ Class {
 
 { #category : #running }
 TermsMeasurementsTest >> setUp [
-	phonetix := PHEngineEnglish  new.
+	super setUp.
 	termsMeasuremnts := TermsMeasurements new
-]
-
-{ #category : #running }
-TermsMeasurementsTest >> tearDown [ 
-	super tearDown
 ]
 
 { #category : #test }
 TermsMeasurementsTest >> testHammingDistanceOfWith [
+
 	self
 		assert:
-			((PHWord with: 'abcde' engine: phonetix)
-				levenshteinDistanceWith: (PHWord with: 'abcde' engine: phonetix))
-		equals: 0.
-	self
-		assert:
-			((PHWord with: 'xxxxx' engine: phonetix)
-				hammingDistanceWith: (PHWord with: 'aaaaa' engine: phonetix))
+			( termsMeasuremnts hammingDistanceOf: 'xxxxx' with: 'aaaaa')
 		equals: 5
 ]
 
@@ -40,11 +30,24 @@ TermsMeasurementsTest >> testHammingDistanceOfWith [
 TermsMeasurementsTest >> testLevenshteinDistanceOfWith [
 	self
 		assert:
-			(termsMeasuremnts levenshteinDistanceOf: 'Moussa' With:'Mousa') 
+			(termsMeasuremnts levenshteinDistanceOf: 'Moussa' with:'Mousa') 
 		equals: 1.
 	self
 		assert:
-			((PHWord with: 'abcde' engine: phonetix)
-				levenshteinDistanceWith: (PHWord with: 'cdeab' engine: phonetix))
+			( termsMeasuremnts  levenshteinDistanceOf: 'abcde' with: 'cdeab' )
 		equals: 4
+]
+
+{ #category : #test }
+TermsMeasurementsTest >> testLevenshteinDistanceOfWith2 [
+
+	self
+		assert: (termsMeasuremnts levenshteinDistanceOf: 'termsMeasuremnts' with:'termsMeasurements') 
+		equals: 1.
+		
+	self
+		assert: (termsMeasuremnts levenshteinDistanceOf: 'measuremnts' with: 'measurements') 
+		equals: 1.
+	
+	
 ]

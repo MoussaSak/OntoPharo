@@ -32,7 +32,6 @@ OntoPharoUI class >> defaultSpec [
 
 { #category : #specs }
 OntoPharoUI class >> open [
-	"self new openWithSpec"
 
 	<script>
 	| example |
