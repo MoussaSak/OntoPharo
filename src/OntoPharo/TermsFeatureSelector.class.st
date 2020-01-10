@@ -9,41 +9,42 @@ Class {
 }
 
 { #category : #sorting }
-TermsFeatureSelector >> collectAllConcepts: aPackage [ 
-| collection conceptsCollection |
-collection := OrderedCollection new.
-conceptsCollection :=  (self splitAllPackageClassesNames: aPackage) .
-conceptsCollection collect: [:i| i collect: [ :x| collection add: (x asString) ]  ] .
-^collection 
+TermsFeatureSelector >> collectAllConcepts: aPackage [
+	"Return all the concepts from class names in aPackage."
+
+	| collection conceptsCollection |
+	collection := Set new.
+	conceptsCollection := self splitAllPackageClassesNames: aPackage.
+	conceptsCollection
+		do: [ :i | i do: [ :x | collection add: x asString ] ].
+	^ collection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #unused }
 TermsFeatureSelector >> getConceptTFIDF: aConcept in: aDocument [
 	
 	^ tfidf scoreOf: aConcept in: aDocument
 ]
 
-{ #category : #'string-manipulation' }
-TermsFeatureSelector >> getPackageAllClassesNames: aPackageName [
-	 |allClassesNames|
-	allClassesNames := (RPackageOrganizer default packageNamed: aPackageName)
-		  definedClasses collect: [ :each | each instanceSide name ].
-	
-	^allClassesNames asOrderedCollection  
-]
-
 { #category : #initialization }
 TermsFeatureSelector >> initialize [
+
+	super initialize.
 	tfidf := PGTermFrequencyInverseDocumentFrequency new.
-	termsMeasurments := TermsMeasurements new.
-	^ super initialize
+	termsMeasurments := TermsMeasurements new. 
+
+]
+
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> packageAllClassesNames: aPackageName [
+	| allClassesNames |
+	allClassesNames := (RPackageOrganizer default packageNamed: aPackageName) definedClassNames.
+	^ allClassesNames asOrderedCollection
 ]
 
 { #category : #sorting }
 TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
 	| aPackageConcepsCollection hammingCollection dictionary |
-	aPackageConcepsCollection := OrderedCollection new.
-	hammingCollection := OrderedCollection new.
 	aPackageConcepsCollection := self collectAllConcepts: aPackage.
 	hammingCollection := aPackageConcepsCollection
 		collect: [ :anotherConcept | 
@@ -59,13 +60,10 @@ TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
 { #category : #sorting }
 TermsFeatureSelector >> sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
 	| aPackageConcepsCollection levenshteinCollection dictionary |
-	aPackageConcepsCollection := OrderedCollection new.
-	levenshteinCollection := OrderedCollection new.
-	aPackageConcepsCollection := self collectAllConcepts: aPackage .
-	
+	aPackageConcepsCollection := self collectAllConcepts: aPackage.
 	levenshteinCollection := aPackageConcepsCollection
 		collect:
-			[ :anotherConcept | termsMeasurments levenshteinDistanceOf: aConcept With: anotherConcept ].
+			[ :anotherConcept | termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept ].
 	dictionary := OrderedDictionary
 		newFromKeys: aPackageConcepsCollection
 		andValues: levenshteinCollection.
@@ -77,21 +75,36 @@ TermsFeatureSelector >> sortConceptsByTFIDF: aCollection [
 	^ aCollection asSortedCollection 
 ]
 
+{ #category : #sorting }
+TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
+	| aPackageConcepsCollection levenshteinCollection sorted |
+	aPackageConcepsCollection := self collectAllConcepts: aPackage.
+	levenshteinCollection := aPackageConcepsCollection
+		collect: [ :anotherConcept | 
+			anotherConcept
+				->
+					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) ].
+	sorted := SortedCollection sortBlock: [ :a :b | a value < b value ].
+	sorted addAll: levenshteinCollection.
+	^ sorted
+]
+
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> splitAllPackageClassesNames: aPackageName [
 	| aPackageAllClassesNames |
-	aPackageAllClassesNames := self getPackageAllClassesNames: aPackageName.
-	^ aPackageAllClassesNames collect: [ :className | (self splitClassName: className) ]
-	"^ allClassesNamesAsCollection collect: [ :e | e collect: #asSymbol ]"
+	aPackageAllClassesNames := self
+		packageAllClassesNames: aPackageName.
+	^ aPackageAllClassesNames
+		collect: [ :className | self splitClassName: className ]
 ]
 
 { #category : #'string-manipulation' }
-TermsFeatureSelector >> splitClassName: aClasseName [
+TermsFeatureSelector >> splitClassName: aClassName [
 
-	^aClasseName splitIdentifierName.
+	^aClassName splitIdentifierName
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #unused }
 TermsFeatureSelector >> suggestConceptNames: aConcept in: aPackage [
 	self trainOn: (self splitAllPackageClassesNames: aPackage).
 	^ self
@@ -99,7 +112,7 @@ TermsFeatureSelector >> suggestConceptNames: aConcept in: aPackage [
 		in: (('A Test from the first example' splitOn: ' ') asArray) 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #unused }
 TermsFeatureSelector >> trainOn: aPackageConcepts [
 	tfidf trainOn: aPackageConcepts
 ]

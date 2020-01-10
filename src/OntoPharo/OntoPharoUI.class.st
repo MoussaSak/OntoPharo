@@ -10,6 +10,9 @@ Class {
 		'button',
 		'aPackage'
 	],
+	#classInstVars : [
+		'refresher'
+	],
 	#category : #'OntoPharo-UI'
 }
 
@@ -31,9 +34,30 @@ OntoPharoUI class >> defaultSpec [
 ]
 
 { #category : #specs }
-OntoPharoUI class >> open [
-	"self new openWithSpec"
+OntoPharoUI class >> initialize [
+	"self initialize"
+	
+	refresher := OntoEventBroker new
+]
 
+{ #category : #specs }
+OntoPharoUI class >> killRefresh [
+
+	refresher unregister
+]
+
+{ #category : #specs }
+OntoPharoUI class >> new [
+
+	| instance | 
+	instance := super new. 
+	refresher addUI: instance.
+	^ instance
+]
+
+{ #category : #specs }
+OntoPharoUI class >> open [
+	"self open"
 	<script>
 	| example |
 	example := OntoPharoUI new.
@@ -50,15 +74,17 @@ OntoPharoUI class >> title [
 
 { #category : #accessing }
 OntoPharoUI >> classes: aList [
+
 	classListPresenter items = aList
 		ifTrue: [ ^ self ].
 	classListPresenter
 		items: aList;
-		selectIndex: 1
+		selectIndex: 1 
 ]
 
 { #category : #initialization }
 OntoPharoUI >> connectPresenters [
+
 	super connectPresenters.
 	classListPresenter
 		transmitTo: conceptListPresenter
@@ -83,10 +109,11 @@ OntoPharoUI >> extractConcepts [
 
 { #category : #initialization }
 OntoPharoUI >> initializePresenters [
+
 	tfs := TermsFeatureSelector new.
 	classListPresenter := self newList.
 	conceptListPresenter := self newList.
-	suggestionPresenter := self newList .
+	suggestionPresenter := self newList.
 	button := self newButton label: 'Propose Suggestions'.
 	self focusOrder
 		add: classListPresenter;
@@ -98,6 +125,22 @@ OntoPharoUI >> initializePresenters [
 { #category : #initialization }
 OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
-	(tfs sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
-		orderedKeys ]
+		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
+			collect: #key ]
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectClass: aClass [
+
+	| index |
+	index := (classListPresenter items indexOf: aClass ifAbsent: [^ self ]).
+	classListPresenter clickAtIndex: index.  
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectClassNamed: aName [
+
+	| index |
+	index := (classListPresenter items  indexOf: aName ifAbsent: [^ self ]).
+	classListPresenter clickAtIndex: index. 
 ]
