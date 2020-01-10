@@ -32,7 +32,7 @@ OntoPharoUI class >> defaultSpec [
 
 { #category : #specs }
 OntoPharoUI class >> open [
-
+	"self open"
 	<script>
 	| example |
 	example := OntoPharoUI new.
@@ -54,11 +54,12 @@ OntoPharoUI >> classes: aList [
 		ifTrue: [ ^ self ].
 	classListPresenter
 		items: aList;
-		selectIndex: 1
+		selectIndex: 1 
 ]
 
 { #category : #initialization }
 OntoPharoUI >> connectPresenters [
+
 	super connectPresenters.
 	classListPresenter
 		transmitTo: conceptListPresenter
@@ -101,4 +102,20 @@ OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
 		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
 			collect: #key ]
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectClass: aClass [
+
+	| index |
+	index := (classListPresenter items indexOf: aClass ifAbsent: [^ self ]).
+	classListPresenter clickAtIndex: index. 
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectClassNamed: aName [
+
+	| index |
+	index := (classListPresenter items  indexOf: aName ifAbsent: [^ self ]).
+	classListPresenter clickAtIndex: index. 
 ]
