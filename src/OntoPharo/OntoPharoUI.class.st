@@ -49,6 +49,7 @@ OntoPharoUI class >> title [
 
 { #category : #accessing }
 OntoPharoUI >> classes: aList [
+
 	classListPresenter items = aList
 		ifTrue: [ ^ self ].
 	classListPresenter
@@ -82,10 +83,11 @@ OntoPharoUI >> extractConcepts [
 
 { #category : #initialization }
 OntoPharoUI >> initializePresenters [
+
 	tfs := TermsFeatureSelector new.
 	classListPresenter := self newList.
 	conceptListPresenter := self newList.
-	suggestionPresenter := self newList .
+	suggestionPresenter := self newList.
 	button := self newButton label: 'Propose Suggestions'.
 	self focusOrder
 		add: classListPresenter;
@@ -97,6 +99,6 @@ OntoPharoUI >> initializePresenters [
 { #category : #initialization }
 OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
-	(tfs sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
-		orderedKeys ]
+		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
+			collect: #key ]
 ]
