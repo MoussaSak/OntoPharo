@@ -17,6 +17,11 @@ TermsMeasurementsTest >> setUp [
 	termsMeasuremnts := TermsMeasurements new
 ]
 
+{ #category : #running }
+TermsMeasurementsTest >> tearDown [ 
+	super tearDown
+]
+
 { #category : #test }
 TermsMeasurementsTest >> testHammingDistanceOfWith [
 	self

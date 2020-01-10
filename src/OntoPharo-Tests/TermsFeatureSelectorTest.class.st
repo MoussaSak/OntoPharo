@@ -18,6 +18,11 @@ TermsFeatureSelectorTest >> setUp [
 	tfs trainOn: trainPackage
 ]
 
+{ #category : #running }
+TermsFeatureSelectorTest >> tearDown [ 
+	super tearDown
+]
+
 { #category : #test }
 TermsFeatureSelectorTest >> testGetConceptIDFIn [
 	| idf |
