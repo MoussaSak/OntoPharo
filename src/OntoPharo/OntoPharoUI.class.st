@@ -10,6 +10,9 @@ Class {
 		'button',
 		'aPackage'
 	],
+	#classInstVars : [
+		'refresher'
+	],
 	#category : #'OntoPharo-UI'
 }
 
@@ -28,6 +31,28 @@ OntoPharoUI class >> defaultSpec [
 				yourself);
 	
 			yourself
+]
+
+{ #category : #specs }
+OntoPharoUI class >> initialize [
+	"self initialize"
+	
+	refresher := OntoEventBroker new
+]
+
+{ #category : #specs }
+OntoPharoUI class >> killRefresh [
+
+	refresher unregister
+]
+
+{ #category : #specs }
+OntoPharoUI class >> new [
+
+	| instance | 
+	instance := super new. 
+	refresher addUI: instance.
+	^ instance
 ]
 
 { #category : #specs }
@@ -109,7 +134,7 @@ OntoPharoUI >> selectClass: aClass [
 
 	| index |
 	index := (classListPresenter items indexOf: aClass ifAbsent: [^ self ]).
-	classListPresenter clickAtIndex: index. 
+	classListPresenter clickAtIndex: index.  
 ]
 
 { #category : #initialization }

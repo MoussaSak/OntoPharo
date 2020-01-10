@@ -1,5 +1,5 @@
 Class {
-	#name : #Displayer,
+	#name : #OntoEventBroker,
 	#superclass : #Object,
 	#instVars : [
 		'ui'
@@ -7,47 +7,52 @@ Class {
 	#category : #OntoPharo
 }
 
-{ #category : #initialization }
-Displayer >> handleClassAdded: anEvent [
+{ #category : #accessing }
+OntoEventBroker >> addUI: aUI [
+
+	ui add: aUI
 ]
 
 { #category : #initialization }
-Displayer >> handleClassModified: anEvent [
+OntoEventBroker >> handleClassAdded: anEvent [
 ]
 
 { #category : #initialization }
-Displayer >> handleClassRemoved: anEvent [
+OntoEventBroker >> handleClassModified: anEvent [
+]
+
+{ #category : #initialization }
+OntoEventBroker >> handleClassRemoved: anEvent [
 
 	
 ]
 
 { #category : #initialization }
-Displayer >> handleMethodAdded: anEVent [
+OntoEventBroker >> handleMethodAdded: anEVent [
 ]
 
 { #category : #initialization }
-Displayer >> handleMethodModified: anEvent [
+OntoEventBroker >> handleMethodModified: anEvent [
 
-	ui ifNotNil: [ 
-		ui selectClass: anEvent classAffected ]
+	ui do: [:each | each selectClass: anEvent classAffected ]
 ]
 
 { #category : #initialization }
-Displayer >> handleMethodRemoved: anEvent [
+OntoEventBroker >> handleMethodRemoved: anEvent [
 
-	anEvent inspect.
  
 	
 ]
 
 { #category : #initialization }
-Displayer >> initialize [ 
+OntoEventBroker >> initialize [ 
 	super initialize.
-	self initializeAnnouncements 
+	self initializeAnnouncements.
+	ui := OrderedCollection new.
 ]
 
 { #category : #initialization }
-Displayer >> initializeAnnouncements [
+OntoEventBroker >> initializeAnnouncements [
 
 	SystemAnnouncer uniqueInstance weak 
 		when: ClassAdded send: #handleClassAdded: to: self;
@@ -59,17 +64,17 @@ Displayer >> initializeAnnouncements [
 ]
 
 { #category : #accessing }
-Displayer >> ui [
+OntoEventBroker >> uiList [
 	^ ui
 ]
 
-{ #category : #accessing }
-Displayer >> ui: anObject [
-	ui := anObject
+{ #category : #private }
+OntoEventBroker >> uiList: aList [
+	ui := aList
 ]
 
 { #category : #initialization }
-Displayer >> unregister [
+OntoEventBroker >> unregister [
 	
 	SystemAnnouncer uniqueInstance unsubscribe: self
 	

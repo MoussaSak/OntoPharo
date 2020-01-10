@@ -28,9 +28,10 @@ TermsFeatureSelector >> getConceptTFIDF: aConcept in: aDocument [
 
 { #category : #initialization }
 TermsFeatureSelector >> initialize [
+
 	super initialize.
 	tfidf := PGTermFrequencyInverseDocumentFrequency new.
-	termsMeasurments := TermsMeasurements new.
+	termsMeasurments := TermsMeasurements new. 
 
 ]
 
