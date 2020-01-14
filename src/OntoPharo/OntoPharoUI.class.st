@@ -8,7 +8,8 @@ Class {
 		'suggestionPresenter',
 		'tfs',
 		'button',
-		'aPackage'
+		'aPackage',
+		'packageListPresenter'
 	],
 	#classInstVars : [
 		'refresher'
@@ -21,11 +22,13 @@ OntoPharoUI class >> defaultSpec [
 	^ SpPanedLayout newVertical
 		add:
 			(SpPanedLayout newHorizontal
+				add: #packageListPresenter ;
 				add: #classListPresenter;
-				add: #conceptListPresenter;
+				
 				yourself);
 		add:
 			(SpBoxLayout newHorizontal
+				add: #conceptListPresenter;
 				add: #suggestionPresenter;
 				"add: #button;"
 				yourself);
@@ -62,7 +65,11 @@ OntoPharoUI class >> open [
 	| example |
 	example := OntoPharoUI new.
 	example
-		classes: self environment allClasses;
+	
+	"	classes: self environment allClasses;"
+	
+		packages: RPackageOrganizer default packages;
+		
 		openWithSpec.
 	^ example
 ]
@@ -84,19 +91,30 @@ OntoPharoUI >> classes: aList [
 
 { #category : #initialization }
 OntoPharoUI >> connectPresenters [
-
 	super connectPresenters.
+	packageListPresenter 
+	transmitTo: classListPresenter 
+	transform: self extractClasses
+	postTransmission: [ :destination | destination selectIndex: 1 ].
+	
 	classListPresenter
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-	"button
-		action: ["
+	
 	conceptListPresenter
 		transmitTo: suggestionPresenter
 		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ].
-	"]"
+		postTransmission: [ :destination | destination selectIndex: 1 ]
+	"button
+		action: []"
+]
+
+{ #category : #initialization }
+OntoPharoUI >> extractClasses [
+	^ [ :aPackageName | 	
+		self classes: (aPackageName classes asOrderedCollection).
+	aPackageName classes asOrderedCollection ]
 ]
 
 { #category : #initialization }
@@ -111,15 +129,27 @@ OntoPharoUI >> extractConcepts [
 OntoPharoUI >> initializePresenters [
 
 	tfs := TermsFeatureSelector new.
+	packageListPresenter := self newList.
 	classListPresenter := self newList.
 	conceptListPresenter := self newList.
 	suggestionPresenter := self newList.
 	button := self newButton label: 'Propose Suggestions'.
 	self focusOrder
+		add: packageListPresenter;
 		add: classListPresenter;
 		add: conceptListPresenter;
 		add: suggestionPresenter;
 		add: button
+]
+
+{ #category : #accessing }
+OntoPharoUI >> packages: aList [
+
+	packageListPresenter items = aList
+		ifTrue: [ ^ self ].
+	packageListPresenter
+		items: aList;
+		selectIndex: 1 
 ]
 
 { #category : #initialization }

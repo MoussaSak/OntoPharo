@@ -28,11 +28,9 @@ TermsFeatureSelector >> getConceptTFIDF: aConcept in: aDocument [
 
 { #category : #initialization }
 TermsFeatureSelector >> initialize [
-
-	super initialize.
+	
 	tfidf := PGTermFrequencyInverseDocumentFrequency new.
-	termsMeasurments := TermsMeasurements new. 
-
+	termsMeasurments := TermsMeasurements new
 ]
 
 { #category : #'string-manipulation' }
@@ -77,7 +75,7 @@ TermsFeatureSelector >> sortConceptsByTFIDF: aCollection [
 
 { #category : #sorting }
 TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
-	| aPackageConcepsCollection levenshteinCollection sorted |
+	| aPackageConcepsCollection levenshteinCollection sorted|
 	aPackageConcepsCollection := self collectAllConcepts: aPackage.
 	levenshteinCollection := aPackageConcepsCollection
 		collect: [ :anotherConcept | 
@@ -86,6 +84,7 @@ TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPac
 					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) ].
 	sorted := SortedCollection sortBlock: [ :a :b | a value < b value ].
 	sorted addAll: levenshteinCollection.
+
 	^ sorted
 ]
 

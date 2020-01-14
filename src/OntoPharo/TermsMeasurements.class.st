@@ -21,17 +21,16 @@ TermsMeasurements >> hammingDistanceOf: aWord with: anotherWord [
 
 { #category : #'as yet unclassified' }
 TermsMeasurements >> levenshteinDistanceOf: aWord with: anotherWord [
+
 	"return the Levenshtein distance between two words"
 
 	| stab cost |
 	"if a string is empty, answer the length of the another string"
 	aWord isEmpty
 		ifTrue: [ ^ anotherWord size ].
-	anotherWord  isEmpty
+	anotherWord isEmpty
 		ifTrue: [ ^ aWord size ].
-	stab := Array2D
-		rows: anotherWord size + 1
-		columns: aWord  size + 1.
+	stab := Array2D rows: anotherWord size + 1 columns: aWord size + 1.
 	1 to: stab columnCount do: [ :i | stab at: 1 at: i put: i - 1 ].
 	1 to: stab rowCount do: [ :i | stab at: i at: 1 put: i - 1 ].
 	2 to: stab columnCount do: [ :i | 
