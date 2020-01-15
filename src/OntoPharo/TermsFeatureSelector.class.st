@@ -81,7 +81,8 @@ TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPac
 		collect: [ :anotherConcept | 
 			anotherConcept
 				->
-					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) ].
+					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) 
+				].
 	sorted := SortedCollection sortBlock: [ :a :b | a value < b value ].
 	sorted addAll: levenshteinCollection.
 

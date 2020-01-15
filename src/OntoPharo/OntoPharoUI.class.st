@@ -30,10 +30,9 @@ OntoPharoUI class >> defaultSpec [
 			(SpBoxLayout newHorizontal
 				add: #conceptListPresenter;
 				add: #suggestionPresenter;
-				"add: #button;"
+				add: #button;
 				yourself);
-	
-			yourself
+		yourself
 ]
 
 { #category : #specs }
@@ -66,10 +65,7 @@ OntoPharoUI class >> open [
 	example := OntoPharoUI new.
 	example
 	
-	"	classes: self environment allClasses;"
-	
-		packages: RPackageOrganizer default packages;
-		
+		packages: RPackageOrganizer default packages;	
 		openWithSpec.
 	^ example
 ]
@@ -92,35 +88,38 @@ OntoPharoUI >> classes: aList [
 { #category : #initialization }
 OntoPharoUI >> connectPresenters [
 	super connectPresenters.
-	packageListPresenter 
-	transmitTo: classListPresenter 
-	transform: self extractClasses
-	postTransmission: [ :destination | destination selectIndex: 1 ].
-	
+	packageListPresenter
+		transmitTo: classListPresenter
+		transform: self extractClasses
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 	classListPresenter
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-	
 	conceptListPresenter
 		transmitTo: suggestionPresenter
 		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ]
-	"button
-		action: []"
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	button
+		action: [ |selectedSuggestion|
+			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
+			Transcript
+				show: selectedSuggestion]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractClasses [
 	^ [ :aPackageName | 	
-		self classes: (aPackageName classes asOrderedCollection).
-	aPackageName classes asOrderedCollection ]
+		aPackage := ((aPackageName asSymbol) asPackage).	
+		self classes: ( aPackage classes asOrderedCollection).
+		aPackage classes asOrderedCollection 
+		]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractConcepts [
 	^ [ :aClass | 
-	aPackage := aClass class package name.
+	"aPackage := aClass class package."
 	
 	tfs splitClassName: aClass getName asString ]
 ]
@@ -133,7 +132,7 @@ OntoPharoUI >> initializePresenters [
 	classListPresenter := self newList.
 	conceptListPresenter := self newList.
 	suggestionPresenter := self newList.
-	button := self newButton label: 'Propose Suggestions'.
+	button := self newButton label: 'Apply Suggestion'.
 	self focusOrder
 		add: packageListPresenter;
 		add: classListPresenter;
@@ -146,16 +145,17 @@ OntoPharoUI >> initializePresenters [
 OntoPharoUI >> packages: aList [
 
 	packageListPresenter items = aList
+	
 		ifTrue: [ ^ self ].
 	packageListPresenter
-		items: aList;
+		items: ((aList collect: ([:aPackagee| aPackagee name asString])) sorted ) ;
 		selectIndex: 1 
 ]
 
 { #category : #initialization }
 OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
-		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage)
+		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
 			collect: #key ]
 ]
 
