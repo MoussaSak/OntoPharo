@@ -41,6 +41,15 @@ TermsFeatureSelector >> packageAllClassesNames: aPackageName [
 ]
 
 { #category : #sorting }
+TermsFeatureSelector >> sort2DCollection: a2DCollection [
+	"Sort a Key/Value Collection"
+	|sorted|
+	sorted := SortedCollection sortBlock: [ :a :b | a value < b value ].
+	sorted addAll: a2DCollection.
+	^ sorted
+]
+
+{ #category : #sorting }
 TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
 	| aPackageConcepsCollection hammingCollection dictionary |
 	aPackageConcepsCollection := self collectAllConcepts: aPackage.
@@ -75,18 +84,16 @@ TermsFeatureSelector >> sortConceptsByTFIDF: aCollection [
 
 { #category : #sorting }
 TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
-	| aPackageConcepsCollection levenshteinCollection sorted|
-	aPackageConcepsCollection := self collectAllConcepts: aPackage.
-	levenshteinCollection := aPackageConcepsCollection
-		collect: [ :anotherConcept | 
+	| aPackageConceptsCollection levenshteinCollection|
+	aPackageConceptsCollection := self collectAllConcepts: aPackage.
+	levenshteinCollection := aPackageConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept )] thenCollect: 
+		 [ :anotherConcept| 
 			anotherConcept
 				->
 					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) 
 				].
-	sorted := SortedCollection sortBlock: [ :a :b | a value < b value ].
-	sorted addAll: levenshteinCollection.
-
-	^ sorted
+	
+	^ self sort2DCollection: levenshteinCollection.
 ]
 
 { #category : #'string-manipulation' }

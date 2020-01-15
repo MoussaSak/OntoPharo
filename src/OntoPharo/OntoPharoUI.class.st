@@ -9,7 +9,8 @@ Class {
 		'tfs',
 		'button',
 		'aPackage',
-		'packageListPresenter'
+		'packageListPresenter',
+		'questionLabel'
 	],
 	#classInstVars : [
 		'refresher'
@@ -19,20 +20,24 @@ Class {
 
 { #category : #specs }
 OntoPharoUI class >> defaultSpec [
+	
+	
 	^ SpPanedLayout newVertical
+	
 		add:
-			(SpPanedLayout newHorizontal
+			(SpBoxLayout newHorizontal 
 				add: #packageListPresenter ;
 				add: #classListPresenter;
-				
+				add: #conceptListPresenter;
+				add: #suggestionPresenter;			
 				yourself);
 		add:
-			(SpBoxLayout newHorizontal
-				add: #conceptListPresenter;
-				add: #suggestionPresenter;
-				add: #button;
+			(SpBoxLayout newHorizontal 
+				add: #questionLabel ;
+				add: #button ;
 				yourself);
 		yourself
+		 
 ]
 
 { #category : #specs }
@@ -129,15 +134,18 @@ OntoPharoUI >> initializePresenters [
 
 	tfs := TermsFeatureSelector new.
 	packageListPresenter := self newList.
-	classListPresenter := self newList.
+	classListPresenter := self newList .
 	conceptListPresenter := self newList.
 	suggestionPresenter := self newList.
+	questionLabel := self newLabel label: 'Do you want to apply the suggestion ?!'.
 	button := self newButton label: 'Apply Suggestion'.
+	
 	self focusOrder
 		add: packageListPresenter;
 		add: classListPresenter;
 		add: conceptListPresenter;
 		add: suggestionPresenter;
+		add: questionLabel;
 		add: button
 ]
 
