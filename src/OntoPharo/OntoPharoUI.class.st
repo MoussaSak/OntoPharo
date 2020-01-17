@@ -10,7 +10,8 @@ Class {
 		'button',
 		'aPackage',
 		'packageListPresenter',
-		'questionLabel'
+		'questionLabel',
+		'aClassName'
 	],
 	#classInstVars : [
 		'refresher'
@@ -22,7 +23,7 @@ Class {
 OntoPharoUI class >> defaultSpec [
 	
 	
-	^ SpPanedLayout newVertical
+	^ SpBoxLayout newVertical
 	
 		add:
 			(SpBoxLayout newHorizontal 
@@ -34,8 +35,8 @@ OntoPharoUI class >> defaultSpec [
 		add:
 			(SpBoxLayout newHorizontal 
 				add: #questionLabel ;
-				add: #button ;
-				yourself);
+				add: #button;
+				yourself) withConstraints: [ :constraints | constraints height: 30 ];
 		yourself
 		 
 ]
@@ -66,18 +67,28 @@ OntoPharoUI class >> new [
 OntoPharoUI class >> open [
 	"self open"
 	<script>
-	| example |
-	example := OntoPharoUI new.
-	example
-	
-		packages: RPackageOrganizer default packages;	
-		openWithSpec.
-	^ example
+	| presenter windowPresenter |
+	presenter := self new.
+	presenter packages: RPackageOrganizer default packages.
+	windowPresenter := presenter openWithSpec.
+	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
+	windowPresenter window extent: 800@600.
+	^ windowPresenter
 ]
 
 { #category : #specs }
 OntoPharoUI class >> title [ 
 	^'OntoPharo'
+]
+
+{ #category : #initialization }
+OntoPharoUI >> buttonHundler [
+
+						|selectedSuggestion selectedConcept selectedClass |
+			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
+			selectedConcept := conceptListPresenter displayValueAt: (conceptListPresenter selection selectedIndex).
+			selectedClass := classListPresenter displayValueAt: (classListPresenter selection selectedIndex).
+			^ selectedClass copyReplaceAll: selectedConcept with: selectedSuggestion.  
 ]
 
 { #category : #accessing }
@@ -106,10 +117,11 @@ OntoPharoUI >> connectPresenters [
 		transform: self proposeSuggestions
 		postTransmission: [ :destination | destination selectIndex: 1 ].
 	button
-		action: [ |selectedSuggestion|
-			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
-			Transcript
-				show: selectedSuggestion]
+		action: [ 
+						|newName|
+						newName := self buttonHundler.
+						self refactorClassName: aClassName to: newName.
+			]
 ]
 
 { #category : #initialization }
@@ -125,7 +137,7 @@ OntoPharoUI >> extractClasses [
 OntoPharoUI >> extractConcepts [
 	^ [ :aClass | 
 	"aPackage := aClass class package."
-	
+	aClassName := aClass name asString .
 	tfs splitClassName: aClass getName asString ]
 ]
 
@@ -133,10 +145,10 @@ OntoPharoUI >> extractConcepts [
 OntoPharoUI >> initializePresenters [
 
 	tfs := TermsFeatureSelector new.
-	packageListPresenter := self newList.
-	classListPresenter := self newList .
-	conceptListPresenter := self newList.
-	suggestionPresenter := self newList.
+	packageListPresenter := self newList headerTitle: 'Packages'.
+	classListPresenter := self newList headerTitle: 'ClassNames'.
+	conceptListPresenter := self newList headerTitle: 'Concepts'.
+	suggestionPresenter := self newList headerTitle: 'Suggestions'.
 	questionLabel := self newLabel label: 'Do you want to apply the suggestion ?!'.
 	button := self newButton label: 'Apply Suggestion'.
 	
@@ -165,6 +177,15 @@ OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
 		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
 			collect: #key ]
+]
+
+{ #category : #accessing }
+OntoPharoUI >> refactorClassName: aClassNamed to: newName [  
+
+"Refactoring class Name to a new Name"
+
+(RBRefactoryChangeFactory instance renameClass: aClassNamed asClass to: newName) execute
+
 ]
 
 { #category : #initialization }
