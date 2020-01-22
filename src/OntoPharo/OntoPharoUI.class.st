@@ -199,7 +199,9 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 OntoPharoUI >> selectClass: aClass [
 
 	"Selects aClass in the UI."
-	| classIndex|
+	| classIndex packageIndex|
+	
+	self selectPackage: aClass.
 	
 	classIndex := (classListPresenter items indexOf: aClass ifAbsent: [ self error: ('Class {1} not found' format: { aClass name }) ]).
 	classListPresenter clickAtIndex: classIndex.
@@ -219,6 +221,6 @@ OntoPharoUI >> selectPackage: aClass [
 	"Selects aClass in the UI."
 	| packageIndex|
 	
-	packageIndex := (packageListPresenter items indexOf: (aClass package)  ifAbsent: [ self error: ('Package {1} not found' format: { aClass package name }) ]).
+	packageIndex := (packageListPresenter items indexOf: (aClass package name asString)  ifAbsent: [ self error: ('Package {1} not found' format: { aClass package name }) ]).
 	packageListPresenter clickAtIndex: packageIndex.
 ]
