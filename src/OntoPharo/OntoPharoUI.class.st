@@ -43,7 +43,7 @@ OntoPharoUI class >> defaultSpec [
 
 { #category : #specs }
 OntoPharoUI class >> initialize [
-	"self initialize"
+	"self initialize."
 	
 	refresher := OntoEventBroker new
 ]
@@ -65,15 +65,25 @@ OntoPharoUI class >> new [
 
 { #category : #specs }
 OntoPharoUI class >> open [
+
 	"self open"
 	<script>
+	
 	| presenter windowPresenter |
-	presenter := self new.
+	presenter := self new. 
 	presenter packages: RPackageOrganizer default packages.
 	windowPresenter := presenter openWithSpec.
+	"windowPresenter whenClosedDo: [ 
+		self killRefresh. 
+		self refresher uiList removeAll]."
 	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
 	windowPresenter window extent: 800@600.
 	^ windowPresenter
+]
+
+{ #category : #accessing }
+OntoPharoUI class >> refresher [
+	^ refresher
 ]
 
 { #category : #specs }
@@ -84,7 +94,7 @@ OntoPharoUI class >> title [
 { #category : #initialization }
 OntoPharoUI >> buttonHundler [
 
-						|selectedSuggestion selectedConcept selectedClass |
+			|selectedSuggestion selectedConcept selectedClass |
 			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
 			selectedConcept := conceptListPresenter displayValueAt: (conceptListPresenter selection selectedIndex).
 			selectedClass := classListPresenter displayValueAt: (classListPresenter selection selectedIndex).
@@ -126,6 +136,8 @@ OntoPharoUI >> connectPresenters [
 
 { #category : #initialization }
 OntoPharoUI >> extractClasses [
+
+
 	^ [ :aPackageName | 	
 		aPackage := ((aPackageName asSymbol) asPackage).	
 		self classes: ( aPackage classes asOrderedCollection).
@@ -161,15 +173,23 @@ OntoPharoUI >> initializePresenters [
 		add: button
 ]
 
+{ #category : #initialization }
+OntoPharoUI >> initializeWindow: aWindowPresenter [
+	aWindowPresenter
+	whenClosedDo: [ self class killRefresh. 
+								self class refresher uiList remove: self ]
+]
+
 { #category : #accessing }
 OntoPharoUI >> packages: aList [
 
 	packageListPresenter items = aList
 	
+	
 		ifTrue: [ ^ self ].
 	packageListPresenter
 		items: ((aList collect: ([:aPackagee| aPackagee name asString])) sorted ) ;
-		selectIndex: 1 
+		selectIndex: 1
 ]
 
 { #category : #initialization }
@@ -177,6 +197,9 @@ OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
 		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
 			collect: #key ]
+		
+		
+	
 ]
 
 { #category : #accessing }
@@ -191,9 +214,11 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 { #category : #initialization }
 OntoPharoUI >> selectClass: aClass [
 
-	| index |
-	index := (classListPresenter items indexOf: aClass ifAbsent: [^ self ]).
-	classListPresenter clickAtIndex: index.  
+	"Selects aClass in the UI."
+	| classIndex|
+	
+	classIndex := (classListPresenter items indexOf: aClass ifAbsent: [ self error: ('Class {1} not found' format: { aClass name }) ]).
+	classListPresenter clickAtIndex: classIndex.
 ]
 
 { #category : #initialization }
@@ -202,4 +227,14 @@ OntoPharoUI >> selectClassNamed: aName [
 	| index |
 	index := (classListPresenter items  indexOf: aName ifAbsent: [^ self ]).
 	classListPresenter clickAtIndex: index. 
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectPackage: aClass [
+
+	"Selects aClass in the UI."
+	| packageIndex|
+	
+	packageIndex := (packageListPresenter items indexOf: (aClass package)  ifAbsent: [ self error: ('Package {1} not found' format: { aClass package name }) ]).
+	packageListPresenter clickAtIndex: packageIndex.
 ]

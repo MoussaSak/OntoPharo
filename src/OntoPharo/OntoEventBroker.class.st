@@ -15,33 +15,41 @@ OntoEventBroker >> addUI: aUI [
 
 { #category : #initialization }
 OntoEventBroker >> handleClassAdded: anEvent [
+
+	ui do: [:each | each selectPackage: anEvent packageAffected].
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleClassModified: anEvent [
+
+	ui do: [:each | each selectPackage: anEvent packageAffected].
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleClassRemoved: anEvent [
 
-	
+	ui do: [:each | each selectPackage: anEvent packageAffected].
 ]
 
 { #category : #initialization }
-OntoEventBroker >> handleMethodAdded: anEVent [
+OntoEventBroker >> handleMethodAdded: anEvent [
+	
+	ui do: [:each | each selectClass: anEvent classAffected ].
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleMethodModified: anEvent [
 
-	ui do: [:each | each selectClass: anEvent classAffected ]
+	Transcript show:'A Method was Modified'. Transcript cr.
+	ui do: [:each | each selectClass: anEvent classAffected ].
+	
+	
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleMethodRemoved: anEvent [
 
- 
-	
+ ui do: [:each | each selectClass: anEvent classAffected ].	
 ]
 
 { #category : #initialization }

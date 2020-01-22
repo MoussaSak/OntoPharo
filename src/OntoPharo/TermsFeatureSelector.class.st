@@ -107,7 +107,6 @@ TermsFeatureSelector >> splitAllPackageClassesNames: aPackageName [
 
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> splitClassName: aClassName [
-
 	^aClassName splitIdentifierName
 ]
 
