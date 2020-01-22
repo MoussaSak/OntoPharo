@@ -57,6 +57,7 @@ OntoEventBroker >> initialize [
 	super initialize.
 	self initializeAnnouncements.
 	ui := OrderedCollection new.
+	Transcript show: 'I was Called'
 ]
 
 { #category : #initialization }

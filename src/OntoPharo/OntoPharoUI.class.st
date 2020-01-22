@@ -14,7 +14,8 @@ Class {
 		'aClassName'
 	],
 	#classInstVars : [
-		'refresher'
+		'refresher',
+		'instance'
 	],
 	#category : #'OntoPharo-UI'
 }
@@ -42,13 +43,6 @@ OntoPharoUI class >> defaultSpec [
 ]
 
 { #category : #specs }
-OntoPharoUI class >> initialize [
-	"self initialize."
-	
-	refresher := OntoEventBroker new
-]
-
-{ #category : #specs }
 OntoPharoUI class >> killRefresh [
 
 	refresher unregister
@@ -56,9 +50,8 @@ OntoPharoUI class >> killRefresh [
 
 { #category : #specs }
 OntoPharoUI class >> new [
-
-	| instance | 
 	instance := super new. 
+	refresher := OntoEventBroker new.
 	refresher addUI: instance.
 	^ instance
 ]
@@ -73,9 +66,9 @@ OntoPharoUI class >> open [
 	presenter := self new. 
 	presenter packages: RPackageOrganizer default packages.
 	windowPresenter := presenter openWithSpec.
-	"windowPresenter whenClosedDo: [ 
+	windowPresenter whenClosedDo: [ 
 		self killRefresh. 
-		self refresher uiList removeAll]."
+		self refresher uiList remove: instance].
 	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
 	windowPresenter window extent: 800@600.
 	^ windowPresenter
@@ -137,7 +130,6 @@ OntoPharoUI >> connectPresenters [
 { #category : #initialization }
 OntoPharoUI >> extractClasses [
 
-
 	^ [ :aPackageName | 	
 		aPackage := ((aPackageName asSymbol) asPackage).	
 		self classes: ( aPackage classes asOrderedCollection).
@@ -173,18 +165,10 @@ OntoPharoUI >> initializePresenters [
 		add: button
 ]
 
-{ #category : #initialization }
-OntoPharoUI >> initializeWindow: aWindowPresenter [
-	aWindowPresenter
-	whenClosedDo: [ self class killRefresh. 
-								self class refresher uiList remove: self ]
-]
-
 { #category : #accessing }
 OntoPharoUI >> packages: aList [
 
 	packageListPresenter items = aList
-	
 	
 		ifTrue: [ ^ self ].
 	packageListPresenter
