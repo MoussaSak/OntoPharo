@@ -4,10 +4,17 @@ Class {
 	#instVars : [
 		'levenshteinDistance',
 		'hummingDistance',
-		'phonetix'
+		'phonetix',
+		'tfidf'
 	],
 	#category : #'OntoPharo-Name-Filtrer'
 }
+
+{ #category : #unused }
+TermsMeasurements >> getConceptTFIDF: aConcept in: aDocument [
+	
+	^ tfidf scoreOf: aConcept in: aDocument
+]
 
 { #category : #distance }
 TermsMeasurements >> hammingDistanceOf: aWord with: anotherWord [
@@ -17,6 +24,12 @@ TermsMeasurements >> hammingDistanceOf: aWord with: anotherWord [
 		(aWord contents at: pos) ~= (anotherWord contents at: pos)
 			ifTrue: [ distance := distance + 1 ] ].
 	^ distance
+]
+
+{ #category : #initialization }
+TermsMeasurements >> initialize [ 
+
+	tfidf := PGTermFrequencyInverseDocumentFrequency new.
 ]
 
 { #category : #'as yet unclassified' }
@@ -47,4 +60,22 @@ TermsMeasurements >> levenshteinDistanceOf: aWord with: anotherWord [
 					((stab at: j - 1 at: i - 1) + cost)}
 						asSortedCollection: [ :a :b | a < b ]) first ] ].
 	^ stab at: stab rowCount at: stab columnCount
+]
+
+{ #category : #sorting }
+TermsMeasurements >> sortConceptsByTFIDF: aCollection [
+	^ aCollection asSortedCollection 
+]
+
+{ #category : #unused }
+TermsMeasurements >> suggestConceptNames: aConcept in: aPackage [
+	self trainOn: (self splitAllPackageClassesNames: aPackage).
+	^ self
+		getConceptTFIDF: aConcept
+		in: (('A Test from the first example' splitOn: ' ') asArray) 
+]
+
+{ #category : #unused }
+TermsMeasurements >> trainOn: aPackageConcepts [
+	tfidf trainOn: aPackageConcepts
 ]

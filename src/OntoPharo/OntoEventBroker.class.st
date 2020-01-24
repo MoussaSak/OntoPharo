@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'ui'
 	],
-	#category : #OntoPharo
+	#category : #'OntoPharo-Announcement'
 }
 
 { #category : #accessing }

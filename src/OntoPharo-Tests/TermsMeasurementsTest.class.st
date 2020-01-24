@@ -6,15 +6,26 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'termsMeasuremnts',
-		'phonetix'
+		'phonetix',
+		'tfs'
 	],
 	#category : #'OntoPharo-Tests-Name-Filtrer'
 }
 
 { #category : #running }
 TermsMeasurementsTest >> setUp [
+	|trainPackage|
 	super setUp.
-	termsMeasuremnts := TermsMeasurements new
+	termsMeasuremnts := TermsMeasurements new.
+	trainPackage := tfs splitAllPackageClassesNames: 'BaselineOfZodiac'.
+	tfs trainOn: trainPackage
+]
+
+{ #category : #test }
+TermsMeasurementsTest >> testGetConceptIDFIn [
+	| idf |
+	idf := tfs getConceptTFIDF: 'Test' in: 'This is a document in Test'.
+	self assert: idf closeTo: 0.
 ]
 
 { #category : #test }

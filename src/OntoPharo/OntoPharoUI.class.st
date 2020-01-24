@@ -2,9 +2,10 @@ Class {
 	#name : #OntoPharoUI,
 	#superclass : #SpPresenter,
 	#instVars : [
-		'dynamicPage',
 		'conceptListPresenter',
 		'classListPresenter',
+		'methodListPresenter',
+		'instanceVariablePresenter',
 		'suggestionPresenter',
 		'tfs',
 		'button',
@@ -30,6 +31,8 @@ OntoPharoUI class >> defaultSpec [
 			(SpBoxLayout newHorizontal 
 				add: #packageListPresenter ;
 				add: #classListPresenter;
+				add: #methodListPresenter ;
+				add: #instanceVariablePresenter;
 				add: #conceptListPresenter;
 				add: #suggestionPresenter;			
 				yourself);
@@ -70,7 +73,7 @@ OntoPharoUI class >> open [
 		self killRefresh. 
 		self refresher uiList remove: instance].
 	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
-	windowPresenter window extent: 800@600.
+	windowPresenter window extent: 1000@600.
 	^ windowPresenter
 ]
 
@@ -112,6 +115,15 @@ OntoPharoUI >> connectPresenters [
 		transform: self extractClasses
 		postTransmission: [ :destination | destination selectIndex: 1 ].
 	classListPresenter
+		transmitTo: methodListPresenter
+		transform: self extractMethods
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	methodListPresenter whenSelectionChangedDo: [ :elem | elem ].
+	classListPresenter
+		transmitTo: instanceVariablePresenter
+		transform: self extractInstanceVariables
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	classListPresenter
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
 		postTransmission: [ :destination | destination selectIndex: 1 ].
@@ -120,11 +132,9 @@ OntoPharoUI >> connectPresenters [
 		transform: self proposeSuggestions
 		postTransmission: [ :destination | destination selectIndex: 1 ].
 	button
-		action: [ 
-						|newName|
-						newName := self buttonHundler.
-						self refactorClassName: aClassName to: newName.
-			]
+		action: [ | newName |
+			newName := self buttonHundler.
+			self refactorClassName: aClassName to: newName ]
 ]
 
 { #category : #initialization }
@@ -140,9 +150,22 @@ OntoPharoUI >> extractClasses [
 { #category : #initialization }
 OntoPharoUI >> extractConcepts [
 	^ [ :aClass | 
-	"aPackage := aClass class package."
 	aClassName := aClass name asString .
-	tfs splitClassName: aClass getName asString ]
+	
+	tfs splitName: aClassName ]
+]
+
+{ #category : #initialization }
+OntoPharoUI >> extractInstanceVariables [
+	^ [ :aClass | 
+	tfs classInstanceVariables: aClass ]
+]
+
+{ #category : #initialization }
+OntoPharoUI >> extractMethods [
+	^ [ :aClass | 
+	tfs classAllMethodsNames: aClass]	
+
 ]
 
 { #category : #initialization }
@@ -150,9 +173,11 @@ OntoPharoUI >> initializePresenters [
 
 	tfs := TermsFeatureSelector new.
 	packageListPresenter := self newList headerTitle: 'Packages'.
-	classListPresenter := self newList headerTitle: 'ClassNames'.
-	conceptListPresenter := self newList headerTitle: 'Concepts'.
-	suggestionPresenter := self newList headerTitle: 'Suggestions'.
+	classListPresenter := self newList headerTitle: 'Class Names'.
+	methodListPresenter := self newList headerTitle: 'Methods Names'.
+	instanceVariablePresenter := self newList headerTitle: 'Instance Variables Names'.
+	conceptListPresenter := self newList headerTitle: 'Class Name Concepts'.
+	suggestionPresenter := self newList headerTitle: 'Class Name Suggestions'.
 	questionLabel := self newLabel label: 'Do you want to apply the suggestion ?!'.
 	button := self newButton label: 'Apply Suggestion'.
 	
@@ -199,7 +224,7 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 OntoPharoUI >> selectClass: aClass [
 
 	"Selects aClass in the UI."
-	| classIndex packageIndex|
+	| classIndex|
 	
 	self selectPackage: aClass.
 	

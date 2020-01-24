@@ -2,11 +2,31 @@ Class {
 	#name : #TermsFeatureSelector,
 	#superclass : #Object,
 	#instVars : [
-		'tfidf',
-		'termsMeasurments'
+		'termsMeasurments',
+		'allMethodsNames',
+		'allInstanceVariables',
+		'allClassesNames'
 	],
 	#category : #'OntoPharo-Name-Filtrer'
 }
+
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> classAllMethodsNames: aClass [
+	"get all Methods Names from a Class"
+
+	allMethodsNames := aClass methods asOrderedCollection collect: [ :methodName|
+	methodName name withoutPrefix: (aClass name asString),'>>#' ].
+	^ allMethodsNames
+]
+
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> classInstanceVariables: aClass [
+	"get all Methods Names from a Class"
+
+	allInstanceVariables := aClass instVarNames asOrderedCollection
+		collect: [ :instanceName | instanceName asString ] .
+	^ allInstanceVariables
+]
 
 { #category : #sorting }
 TermsFeatureSelector >> collectAllConcepts: aPackage [
@@ -20,21 +40,14 @@ TermsFeatureSelector >> collectAllConcepts: aPackage [
 	^ collection
 ]
 
-{ #category : #unused }
-TermsFeatureSelector >> getConceptTFIDF: aConcept in: aDocument [
-	
-	^ tfidf scoreOf: aConcept in: aDocument
-]
-
 { #category : #initialization }
 TermsFeatureSelector >> initialize [
-	
-	tfidf := PGTermFrequencyInverseDocumentFrequency new.
 	termsMeasurments := TermsMeasurements new
 ]
 
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> packageAllClassesNames: aPackageName [
+	"get all classes Names from a Package Name"
 	| allClassesNames |
 	allClassesNames := (RPackageOrganizer default packageNamed: aPackageName) definedClassNames.
 	^ allClassesNames asOrderedCollection
@@ -78,11 +91,6 @@ TermsFeatureSelector >> sortConceptsByLevenshteinDistanceOf: aConcept in: aPacka
 ]
 
 { #category : #sorting }
-TermsFeatureSelector >> sortConceptsByTFIDF: aCollection [
-	^ aCollection asSortedCollection 
-]
-
-{ #category : #sorting }
 TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
 	| aPackageConceptsCollection levenshteinCollection|
 	aPackageConceptsCollection := self collectAllConcepts: aPackage.
@@ -102,23 +110,10 @@ TermsFeatureSelector >> splitAllPackageClassesNames: aPackageName [
 	aPackageAllClassesNames := self
 		packageAllClassesNames: aPackageName.
 	^ aPackageAllClassesNames
-		collect: [ :className | self splitClassName: className ]
+		collect: [ :className | self splitName: className ]
 ]
 
 { #category : #'string-manipulation' }
-TermsFeatureSelector >> splitClassName: aClassName [
+TermsFeatureSelector >> splitName: aClassName [
 	^aClassName splitIdentifierName
-]
-
-{ #category : #unused }
-TermsFeatureSelector >> suggestConceptNames: aConcept in: aPackage [
-	self trainOn: (self splitAllPackageClassesNames: aPackage).
-	^ self
-		getConceptTFIDF: aConcept
-		in: (('A Test from the first example' splitOn: ' ') asArray) 
-]
-
-{ #category : #unused }
-TermsFeatureSelector >> trainOn: aPackageConcepts [
-	tfidf trainOn: aPackageConcepts
 ]

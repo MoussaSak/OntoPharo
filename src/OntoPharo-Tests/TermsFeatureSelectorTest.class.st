@@ -14,8 +14,7 @@ Class {
 TermsFeatureSelectorTest >> setUp [
 	| trainPackage |
 	tfs := TermsFeatureSelector new.
-	trainPackage := tfs splitAllPackageClassesNames: 'BaselineOfZodiac'.
-	tfs trainOn: trainPackage
+	
 ]
 
 { #category : #running }
@@ -24,10 +23,10 @@ TermsFeatureSelectorTest >> tearDown [
 ]
 
 { #category : #test }
-TermsFeatureSelectorTest >> testGetConceptIDFIn [
-	| idf |
-	idf := tfs getConceptTFIDF: 'Test' in: 'This is a document in Test'.
-	self assert: idf closeTo: 0.
+TermsFeatureSelectorTest >> testClassSideMethods [
+	
+	self assert: (tfs classSideMethods: TermsFeatureSelector ) isEmpty  equals: true .
+	self assert: (tfs classSideMethods: OntoPharoUI) equals:  {OntoPharoUI class>>#title. OntoPharoUI class>>#open. OntoPharoUI class>>#new. OntoPharoUI class>>#killRefresh. OntoPharoUI class>>#defaultSpec. OntoPharoUI class>>#refresher}
 ]
 
 { #category : #test }
