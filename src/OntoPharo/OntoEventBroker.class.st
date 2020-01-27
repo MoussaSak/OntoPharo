@@ -39,9 +39,10 @@ OntoEventBroker >> handleMethodAdded: anEvent [
 
 { #category : #initialization }
 OntoEventBroker >> handleMethodModified: anEvent [
-
-	Transcript show:'A Method was Modified'. Transcript cr.
-	ui do: [:each | each selectClass: anEvent classAffected ].
+	
+	
+	ui do: [ :each | each selectMethod: anEvent methodAffected].
+	ui do: [:each | each selectClass: anEvent classAffected].
 	
 	
 ]

@@ -2,7 +2,7 @@ Class {
 	#name : #OntoPharoUserUI,
 	#superclass : #OntoPharoUI,
 	#instVars : [
-		'aClassmethods',
+		'aClassMethods',
 		'aClassInstanceVariables',
 		'methodNameSuggestionPresenter',
 		'instaceVariableNameSuggestion'
@@ -18,6 +18,8 @@ OntoPharoUserUI class >> defaultSpec [
 	
 		add:
 			(SpBoxLayout newHorizontal 
+				add: #methodListPresenter;
+				add: #conceptListPresenter;
 				add: #suggestionPresenter;			
 				yourself);
 		add:
@@ -73,35 +75,50 @@ OntoPharoUserUI class >> title [
 
 { #category : #initialization }
 OntoPharoUserUI >> connectPresenters [
+
+
 	super connectPresenters.
-	self extractClassNameConcepts.
+	methodListPresenter 
+	transmitTo: conceptListPresenter 
+	transform: self extractMethodConcepts
+	postTransmission: [ :destination | destination selectIndex: 1 ].
 	conceptListPresenter
-		transmitTo: suggestionPresenter
-		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ].
-	button
-		action: [ 
-						|newName|
-						newName := self buttonHundler.
-						self refactorClassName: aClassName to: newName.
-			]
+	transmitTo: suggestionPresenter
+	transform: self proposeMethodSuggestions
+	postTransmission: [ :destination | destination selectIndex: 1 ].
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> extractClassNameConcepts [
 
-	^[ :aClass | 
-		aPackage := aClass package.
-		aClassName := aClass name asString.
-		aClassmethods := tfs methods: aClass.
-		aClassInstanceVariables := tfs instanceVariables: aClass.
-		tfs splitName: aClass getName asString ]
+
+]
+
+{ #category : #initialization }
+OntoPharoUserUI >> extractMethodConcepts [
+	^[:aMethodName|
+		methodTfs splitName: aMethodName.
+	 ]
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> initializePresenter [
 
 	super initializePresenter.
-	methodNameSuggestionPresenter := self newList headerTitle: 'Method Name Suggestions'.
+	conceptListPresenter headerTitle: 'Method Name Suggestions'.
+	suggestionPresenter headerTitle: 'Method name Suggestion'.
 	instaceVariableNameSuggestion := self newList headerTitle: 'Instance Variable Name Suggestions'.
+
+]
+
+{ #category : #initialization }
+OntoPharoUserUI >> proposeInstancVariableSuggestions [
+]
+
+{ #category : #initialization }
+OntoPharoUserUI >> proposeMethodSuggestions [
+		^ [ :aConcept | 
+		(methodTfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
+			collect: #key ]
+		
 ]

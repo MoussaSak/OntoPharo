@@ -1,3 +1,8 @@
+"
+OntoPharo main interface execute 
+
+	'OntoPharo open' to run it. 
+"
 Class {
 	#name : #OntoPharoUI,
 	#superclass : #SpPresenter,
@@ -12,7 +17,9 @@ Class {
 		'aPackage',
 		'packageListPresenter',
 		'questionLabel',
-		'aClassName'
+		'aClassName',
+		'methodTfs',
+		'isnsatnceVariabletfs'
 	],
 	#classInstVars : [
 		'refresher',
@@ -118,7 +125,6 @@ OntoPharoUI >> connectPresenters [
 		transmitTo: methodListPresenter
 		transform: self extractMethods
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-	methodListPresenter whenSelectionChangedDo: [ :elem | elem ].
 	classListPresenter
 		transmitTo: instanceVariablePresenter
 		transform: self extractInstanceVariables
@@ -150,21 +156,21 @@ OntoPharoUI >> extractClasses [
 { #category : #initialization }
 OntoPharoUI >> extractConcepts [
 	^ [ :aClass | 
-	aClassName := aClass name asString .
 	
+	aClassName := aClass name asString.
 	tfs splitName: aClassName ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractInstanceVariables [
 	^ [ :aClass | 
-	tfs classInstanceVariables: aClass ]
+	isnsatnceVariabletfs classInstanceVariables: aClass ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractMethods [
 	^ [ :aClass | 
-	tfs classAllMethodsNames: aClass]	
+	methodTfs classAllMethodsNames: aClass]	
 
 ]
 
@@ -172,6 +178,8 @@ OntoPharoUI >> extractMethods [
 OntoPharoUI >> initializePresenters [
 
 	tfs := TermsFeatureSelector new.
+	methodTfs := MethodTermsFeatureSelector new.
+	isnsatnceVariabletfs := InstanceVariableFeatureSelector new.
 	packageListPresenter := self newList headerTitle: 'Packages'.
 	classListPresenter := self newList headerTitle: 'Class Names'.
 	methodListPresenter := self newList headerTitle: 'Methods Names'.
@@ -223,11 +231,11 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 { #category : #initialization }
 OntoPharoUI >> selectClass: aClass [
 
-	"Selects aClass in the UI."
+	"Selects a Class in the UI."
 	| classIndex|
 	
 	self selectPackage: aClass.
-	
+
 	classIndex := (classListPresenter items indexOf: aClass ifAbsent: [ self error: ('Class {1} not found' format: { aClass name }) ]).
 	classListPresenter clickAtIndex: classIndex.
 ]
@@ -238,6 +246,17 @@ OntoPharoUI >> selectClassNamed: aName [
 	| index |
 	index := (classListPresenter items  indexOf: aName ifAbsent: [^ self ]).
 	classListPresenter clickAtIndex: index. 
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectMethod: aMethod [
+	"Selects a Method in the UI."
+
+	| aMethodName methodIndex|
+	self selectClass: (aMethod methodClass).
+	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString ),'>>#'.
+	methodIndex := (methodListPresenter items indexOf: aMethodName ifAbsent: [ self error: ('Method {1} not found' format: { aMethodName }) ]).
+	methodListPresenter selectIndex: methodIndex
 ]
 
 { #category : #initialization }
