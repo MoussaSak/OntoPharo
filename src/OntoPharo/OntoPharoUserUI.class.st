@@ -5,7 +5,8 @@ Class {
 		'aClassMethods',
 		'aClassInstanceVariables',
 		'methodNameSuggestionPresenter',
-		'instaceVariableNameSuggestion'
+		'instanceVariableConceptPresenter',
+		'instanceVariableNameSuggestion'
 	],
 	#category : #'OntoPharo-UI'
 }
@@ -24,8 +25,14 @@ OntoPharoUserUI class >> defaultSpec [
 				yourself);
 		add:
 			(SpBoxLayout newHorizontal 
+				add: #instanceVariablePresenter;
+				add: #instanceVariableConceptPresenter;
+				add: #instanceVariableNameSuggestion;
+				yourself);
+		add: 
+		(SpBoxLayout newHorizontal 
 				add: #questionLabel ;
-				add: #button;
+				add: #button ;
 				yourself) withConstraints: [ :constraints | constraints height: 30 ];
 		yourself
 		 
@@ -47,10 +54,8 @@ OntoPharoUserUI class >> new [
 
 { #category : #specs }
 OntoPharoUserUI class >> open [
-
 	"self open"
 	<script>
-	
 	| presenter windowPresenter |
 	presenter := self new. 
 	presenter packages: RPackageOrganizer default packages.
@@ -59,7 +64,7 @@ OntoPharoUserUI class >> open [
 		self killRefresh. 
 		self refresher uiList remove: instance].
 	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
-	"windowPresenter window extent: 800@600."
+	windowPresenter window extent: 800@600.
 	^ windowPresenter
 ]
 
@@ -76,7 +81,6 @@ OntoPharoUserUI class >> title [
 { #category : #initialization }
 OntoPharoUserUI >> connectPresenters [
 
-
 	super connectPresenters.
 	methodListPresenter 
 	transmitTo: conceptListPresenter 
@@ -86,18 +90,32 @@ OntoPharoUserUI >> connectPresenters [
 	transmitTo: suggestionPresenter
 	transform: self proposeMethodSuggestions
 	postTransmission: [ :destination | destination selectIndex: 1 ].
+	instanceVariablePresenter 
+	transmitTo: instanceVariableConceptPresenter
+	transform: self extractInstanceVariableConcepts 
+	postTransmission: [ :destination | destination selectIndex: 1 ].
+	instanceVariableConceptPresenter
+	transmitTo: instanceVariableNameSuggestion
+	transform: self proposeInstancVariableSuggestions  
+	postTransmission: [ :destination | destination selectIndex: 1 ].
+	
+	
 ]
 
 { #category : #initialization }
-OntoPharoUserUI >> extractClassNameConcepts [
+OntoPharoUserUI >> extractInstanceVariableConcepts [
 
-
+	^[:instanceVariable|
+		instanceVariable ifNotNil: [ 
+		instanceVariableTFS splitName: instanceVariable.]
+	 ]
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> extractMethodConcepts [
 	^[:aMethodName|
-		methodTfs splitName: aMethodName.
+		aMethodName ifNotNil: [ 
+		methodTFS splitName: aMethodName.]
 	 ]
 ]
 
@@ -107,18 +125,22 @@ OntoPharoUserUI >> initializePresenter [
 	super initializePresenter.
 	conceptListPresenter headerTitle: 'Method Name Suggestions'.
 	suggestionPresenter headerTitle: 'Method name Suggestion'.
-	instaceVariableNameSuggestion := self newList headerTitle: 'Instance Variable Name Suggestions'.
-
+	instanceVariableConceptPresenter := self newList headerTitle:  'Instance Variable Concepts'.
+	instanceVariableNameSuggestion := self newList headerTitle: 'Instance Variable Name Suggestions'.
+	
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> proposeInstancVariableSuggestions [
+		^ [ :aConcept | 
+		(instanceVariableTFS sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
+			collect: #key ]
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> proposeMethodSuggestions [
 		^ [ :aConcept | 
-		(methodTfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
+		(methodTFS sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
 			collect: #key ]
 		
 ]

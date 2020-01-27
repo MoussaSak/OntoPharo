@@ -18,8 +18,8 @@ Class {
 		'packageListPresenter',
 		'questionLabel',
 		'aClassName',
-		'methodTfs',
-		'isnsatnceVariabletfs'
+		'instanceVariableTFS',
+		'methodTFS'
 	],
 	#classInstVars : [
 		'refresher',
@@ -164,13 +164,13 @@ OntoPharoUI >> extractConcepts [
 { #category : #initialization }
 OntoPharoUI >> extractInstanceVariables [
 	^ [ :aClass | 
-	isnsatnceVariabletfs classInstanceVariables: aClass ]
+	instanceVariableTFS classInstanceVariables: aClass ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractMethods [
 	^ [ :aClass | 
-	methodTfs classAllMethodsNames: aClass]	
+	methodTFS classAllMethodsNames: aClass]	
 
 ]
 
@@ -178,8 +178,8 @@ OntoPharoUI >> extractMethods [
 OntoPharoUI >> initializePresenters [
 
 	tfs := TermsFeatureSelector new.
-	methodTfs := MethodTermsFeatureSelector new.
-	isnsatnceVariabletfs := InstanceVariableFeatureSelector new.
+	methodTFS := MethodTermsFeatureSelector new.
+	instanceVariableTFS := InstanceVariableFeatureSelector new.
 	packageListPresenter := self newList headerTitle: 'Packages'.
 	classListPresenter := self newList headerTitle: 'Class Names'.
 	methodListPresenter := self newList headerTitle: 'Methods Names'.
@@ -233,9 +233,7 @@ OntoPharoUI >> selectClass: aClass [
 
 	"Selects a Class in the UI."
 	| classIndex|
-	
 	self selectPackage: aClass.
-
 	classIndex := (classListPresenter items indexOf: aClass ifAbsent: [ self error: ('Class {1} not found' format: { aClass name }) ]).
 	classListPresenter clickAtIndex: classIndex.
 ]
