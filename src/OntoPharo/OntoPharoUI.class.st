@@ -17,9 +17,11 @@ Class {
 		'aPackage',
 		'packageListPresenter',
 		'questionLabel',
-		'aClassName',
 		'instanceVariableTFS',
-		'methodTFS'
+		'methodTFS',
+		'instanceVariableConceptPresenter',
+		'instanceVariableNameSuggestion',
+		'aClass'
 	],
 	#classInstVars : [
 		'refresher',
@@ -95,13 +97,16 @@ OntoPharoUI class >> title [
 ]
 
 { #category : #initialization }
-OntoPharoUI >> buttonHundler [
-
-			|selectedSuggestion selectedConcept selectedClass |
+OntoPharoUI >> buttonHandler [
+			"handels the button work"
+			|newName selectedSuggestion selectedConcept selectedClass |
 			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
 			selectedConcept := conceptListPresenter displayValueAt: (conceptListPresenter selection selectedIndex).
+			
 			selectedClass := classListPresenter displayValueAt: (classListPresenter selection selectedIndex).
-			^ selectedClass copyReplaceAll: selectedConcept with: selectedSuggestion.  
+			newName := self replaceConcept: selectedConcept with: selectedSuggestion. 
+			
+			^ self refactorClassName: selectedClass to: newName.
 ]
 
 { #category : #accessing }
@@ -117,10 +122,10 @@ OntoPharoUI >> classes: aList [
 { #category : #initialization }
 OntoPharoUI >> connectPresenters [
 	super connectPresenters.
-	packageListPresenter
+	packageListPresenter	
 		transmitTo: classListPresenter
 		transform: self extractClasses
-		postTransmission: [ :destination | destination selectIndex: 1 ].
+		postTransmission: [ :destination | destination selectIndex: 1 ]. 	
 	classListPresenter
 		transmitTo: methodListPresenter
 		transform: self extractMethods
@@ -136,11 +141,10 @@ OntoPharoUI >> connectPresenters [
 	conceptListPresenter
 		transmitTo: suggestionPresenter
 		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ].
+		postTransmission: [ :destination | destination selectIndex: 1 ] .
+		
 	button
-		action: [ | newName |
-			newName := self buttonHundler.
-			self refactorClassName: aClassName to: newName ]
+		action: [ self buttonHandler ]
 ]
 
 { #category : #initialization }
@@ -155,22 +159,22 @@ OntoPharoUI >> extractClasses [
 
 { #category : #initialization }
 OntoPharoUI >> extractConcepts [
-	^ [ :aClass | 
+	^ [ :selectedClass | 
 	
-	aClassName := aClass name asString.
-	tfs splitName: aClassName ]
+	aClass := selectedClass.
+	tfs splitName: aClass name asString ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractInstanceVariables [
-	^ [ :aClass | 
-	instanceVariableTFS classInstanceVariables: aClass ]
+	^ [ :selectedClass | 
+	instanceVariableTFS classInstanceVariables: selectedClass ]
 ]
 
 { #category : #initialization }
 OntoPharoUI >> extractMethods [
-	^ [ :aClass | 
-	methodTFS classAllMethodsNames: aClass]	
+	^ [ :selectedClass | 
+	methodTFS classAllMethodsNames: selectedClass]	
 
 ]
 
@@ -229,12 +233,21 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 ]
 
 { #category : #initialization }
-OntoPharoUI >> selectClass: aClass [
+OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
+
+	"This method replaces the selected concept in the tables with the selected suggestion"
+			|selectedClass |
+			selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).
+			^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
+]
+
+{ #category : #initialization }
+OntoPharoUI >> selectClass: selectedClass [
 
 	"Selects a Class in the UI."
 	| classIndex|
-	self selectPackage: aClass.
-	classIndex := (classListPresenter items indexOf: aClass ifAbsent: [ self error: ('Class {1} not found' format: { aClass name }) ]).
+	self selectPackage: selectedClass.
+	classIndex := (classListPresenter items indexOf: selectedClass ifAbsent: [ self error: ('Class {1} not found' format: { selectedClass name }) ]).
 	classListPresenter clickAtIndex: classIndex.
 ]
 

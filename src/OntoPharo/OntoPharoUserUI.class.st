@@ -5,8 +5,8 @@ Class {
 		'aClassMethods',
 		'aClassInstanceVariables',
 		'methodNameSuggestionPresenter',
-		'instanceVariableConceptPresenter',
-		'instanceVariableNameSuggestion'
+		'methodName',
+		'methodConceptListPresenter'
 	],
 	#category : #'OntoPharo-UI'
 }
@@ -20,7 +20,7 @@ OntoPharoUserUI class >> defaultSpec [
 		add:
 			(SpBoxLayout newHorizontal 
 				add: #methodListPresenter;
-				add: #conceptListPresenter;
+				add: #methodConceptListPresenter;
 				add: #suggestionPresenter;			
 				yourself);
 		add:
@@ -79,43 +79,61 @@ OntoPharoUserUI class >> title [
 ]
 
 { #category : #initialization }
+OntoPharoUserUI >> buttonHandler [ 
+
+		"handels the Button Work"
+		
+			| newName selectedConcept selectedSuggestion|
+			selectedConcept := methodConceptListPresenter  displayValueAt: (methodConceptListPresenter selection selectedIndex).
+			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
+			
+			newName := self replaceConcept: selectedConcept with: selectedSuggestion.
+	
+			self refactorMethodName: methodName to: newName.
+]
+
+{ #category : #initialization }
 OntoPharoUserUI >> connectPresenters [
 
 	super connectPresenters.
-	methodListPresenter 
-	transmitTo: conceptListPresenter 
+	
+	methodListPresenter
+	transmitTo: methodConceptListPresenter 
 	transform: self extractMethodConcepts
-	postTransmission: [ :destination | destination selectIndex: 1 ].
-	conceptListPresenter
+	postTransmission: [ :destination | destination selectIndex: 1].
+	methodConceptListPresenter
 	transmitTo: suggestionPresenter
 	transform: self proposeMethodSuggestions
-	postTransmission: [ :destination | destination selectIndex: 1 ].
-	instanceVariablePresenter 
+	postTransmission: [ :destination | destination selectIndex: 1].
+	instanceVariablePresenter
 	transmitTo: instanceVariableConceptPresenter
 	transform: self extractInstanceVariableConcepts 
-	postTransmission: [ :destination | destination selectIndex: 1 ].
+	postTransmission: [ :destination | destination selectIndex: 1].
 	instanceVariableConceptPresenter
 	transmitTo: instanceVariableNameSuggestion
 	transform: self proposeInstancVariableSuggestions  
-	postTransmission: [ :destination | destination selectIndex: 1 ].
+	postTransmission: [ :destination | destination selectIndex: 1].
 	
-	
+	button
+		action: [ self buttonHandler]
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> extractInstanceVariableConcepts [
-
-	^[:instanceVariable|
-		instanceVariable ifNotNil: [ 
-		instanceVariableTFS splitName: instanceVariable.]
-	 ]
+	^ [ :instanceVariable | 
+	instanceVariable
+		ifNotNil: [ instanceVariableTFS splitName: instanceVariable ]
+		ifNil: [ #() ] ]
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> extractMethodConcepts [
+
 	^[:aMethodName|
 		aMethodName ifNotNil: [ 
-		methodTFS splitName: aMethodName.]
+			methodName := aMethodName.
+			methodTFS splitName: aMethodName] 
+		ifNil: [ #() ]
 	 ]
 ]
 
@@ -123,8 +141,8 @@ OntoPharoUserUI >> extractMethodConcepts [
 OntoPharoUserUI >> initializePresenter [
 
 	super initializePresenter.
-	conceptListPresenter headerTitle: 'Method Name Suggestions'.
-	suggestionPresenter headerTitle: 'Method name Suggestion'.
+	methodConceptListPresenter := self newList headerTitle: 'Method Name Concepts'.
+	suggestionPresenter headerTitle: 'Method name Suggestions'.
 	instanceVariableConceptPresenter := self newList headerTitle:  'Instance Variable Concepts'.
 	instanceVariableNameSuggestion := self newList headerTitle: 'Instance Variable Name Suggestions'.
 	
@@ -132,15 +150,39 @@ OntoPharoUserUI >> initializePresenter [
 
 { #category : #initialization }
 OntoPharoUserUI >> proposeInstancVariableSuggestions [
+
 		^ [ :aConcept | 
-		(instanceVariableTFS sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
-			collect: #key ]
+		aConcept ifNotNil: [ (instanceVariableTFS sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
+			collect: #key ] ifNil: [ #() ]]
 ]
 
 { #category : #initialization }
 OntoPharoUserUI >> proposeMethodSuggestions [
 		^ [ :aConcept | 
+	
+		aConcept ifNotNil: [ 
 		(methodTFS sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
-			collect: #key ]
+			collect: #key ] ifNil: [ #() ] ]
 		
+]
+
+{ #category : #initialization }
+OntoPharoUserUI >> refactorMethodName: aMethodName in:  aClass to: aNewName [ 
+	
+	(RBRenameMethodRefactoring renameMethod: aMethodName asSymbol in: aClass  to: aNewName  permutation: (1 to: 0) ) execute.
+]
+
+{ #category : #initialization }
+OntoPharoUserUI >> refactorMethodName: aMethodName to: aNewName [ 
+	
+	(RBRenameMethodRefactoring renameMethod: aMethodName asSymbol in: aClass to: aNewName  permutation: (1 to: 0) ) execute.
+]
+
+{ #category : #initialization }
+OntoPharoUserUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
+
+		"This method replaces the selected concept in the tables with the selected suggestion"
+			|selectedMethod |
+			selectedMethod := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
+			^ selectedMethod copyReplaceAll: selectedConcept with: selectedSuggestion.   
 ]
