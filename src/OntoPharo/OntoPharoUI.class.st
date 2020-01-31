@@ -101,7 +101,6 @@ OntoPharoUI class >> title [
 { #category : #api }
 OntoPharoUI >> buttonHandler [
 	"handels the button work"
-
 	| newName selectedSuggestion selectedConcept selectedClass |
 	selectedConcept := self getSelectedConcept.
 	selectedSuggestion := self getSelectedSuggestion.
@@ -241,7 +240,7 @@ OntoPharoUI >> packages: aList [
 
 { #category : #api }
 OntoPharoUI >> proposeBigramsSuggestions [
-	"Propose Bigrams suggestions"
+	"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
 		(tfs proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
 		(index history last, index last)

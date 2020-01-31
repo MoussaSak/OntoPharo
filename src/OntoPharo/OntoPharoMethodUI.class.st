@@ -7,7 +7,8 @@ Class {
 		'methodNameSuggestionPresenter',
 		'methodName',
 		'methodConceptListPresenter',
-		'methodSuggestionListPresenter'
+		'methodSuggestionListPresenter',
+		'methodBigramSuggestionListPresenter'
 	],
 	#category : #'OntoPharo-UI'
 }
@@ -22,7 +23,8 @@ OntoPharoMethodUI class >> defaultSpec [
 			(SpBoxLayout newHorizontal 
 				add: #methodListPresenter;
 				add: #methodConceptListPresenter;
-				add: #methodSuggestionListPresenter ;			
+				add: #methodSuggestionListPresenter ;	
+				add: #methodBigramSuggestionListPresenter;		
 				yourself);
 		add: 
 		(SpBoxLayout newHorizontal 
@@ -64,6 +66,10 @@ OntoPharoMethodUI >> connectPresenters [
 	transmitTo: methodSuggestionListPresenter
 	transform: self proposeMethodSuggestions
 	postTransmission: [ :destination | destination selectIndex: 1].
+	methodConceptListPresenter
+	transmitTo: methodBigramSuggestionListPresenter 
+	transform: self proposeMethodBigramsSuggestions 
+	postTransmission: [ :destination | destination selectIndex: 1].
 	
 	button
 		action: [ self buttonHandler]
@@ -100,8 +106,19 @@ OntoPharoMethodUI >> initializePresenter [
 	
 	methodConceptListPresenter := self newList headerTitle: 'Method Name Concepts'.
 	methodSuggestionListPresenter := self newList  headerTitle: 'Method name Suggestions'.
+	methodBigramSuggestionListPresenter := self newList headerTitle: 'Method name Bigrams Suggestions'
 
 	
+]
+
+{ #category : #initialization }
+OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
+		"Propose Bigrams suggestions for Classes Names"
+	^ [ :aConcept | 
+		(methodTFS proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
+		(index history last, index last)
+		 ]
+		]
 ]
 
 { #category : #initialization }

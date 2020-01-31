@@ -3,7 +3,8 @@ Class {
 	#superclass : #OntoPharoUI,
 	#instVars : [
 		'aClassInstanceVariables',
-		'instanceVariableName'
+		'instanceVariableName',
+		'instanceVariableNameBigramSuggestions'
 	],
 	#category : #'OntoPharo-UI'
 }
@@ -19,6 +20,7 @@ OntoPharoInstanceVariableUI class >> defaultSpec [
 				add: #instanceVariablePresenter;
 				add: #instanceVariableConceptPresenter;
 				add: #instanceVariableNameSuggestion;
+				add: #instanceVariableNameBigramSuggestions;
 				yourself);
 		add: 
 		(SpBoxLayout newHorizontal 
@@ -60,6 +62,10 @@ OntoPharoInstanceVariableUI >> connectPresenters [
 	transmitTo: instanceVariableNameSuggestion
 	transform: self proposeInstancVariableSuggestions  
 	postTransmission: [ :destination | destination selectIndex: 1].
+	instanceVariableConceptPresenter
+	transmitTo: instanceVariableNameBigramSuggestions 
+	transform: self proposeInstancVariableBigramSuggestions  
+	postTransmission: [ :destination | destination selectIndex: 1].
 	
 	button
 		action: [ self buttonHandler]
@@ -93,7 +99,19 @@ OntoPharoInstanceVariableUI >> initializePresenters [
 	super initializePresenters.
 	instanceVariableConceptPresenter := self newList headerTitle:  'Instance Variable Concepts'.
 	instanceVariableNameSuggestion := self newList headerTitle: 'Instance Variable Name Suggestions'.
+	instanceVariableNameBigramSuggestions := self newList headerTitle: 'Instance Variable Bigrams Name Suggestions'.
 	
+]
+
+{ #category : #initialization }
+OntoPharoInstanceVariableUI >> proposeInstancVariableBigramSuggestions [
+		"Propose Bigrams suggestions for Classes Names"
+	^ [ :aConcept | 
+		(instanceVariableTFS proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
+		(index history last, index last)
+		 ]
+		]
+		
 ]
 
 { #category : #initialization }

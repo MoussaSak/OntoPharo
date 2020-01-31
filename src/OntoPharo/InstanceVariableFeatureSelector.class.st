@@ -16,7 +16,6 @@ InstanceVariableFeatureSelector >> classInstanceVariables: aClass [
 { #category : #sorting }
 InstanceVariableFeatureSelector >> collectAllInstanceVariablesConcepts: aPackage [
 	"Return all Instance Variables concepts  in a given Package."
-
 	| collection conceptsCollection |
 	collection := Set new.
 	conceptsCollection := self splitAllPackageInstanceNames: aPackage.
@@ -41,6 +40,28 @@ InstanceVariableFeatureSelector >> packageAllInatanceVariablesNames: aPackageNam
 		instanceCollection add: (self classInstanceVariables: className asClass)	
 		].
 	^instanceCollection flatCollect: [ :instanceName| instanceName ]
+]
+
+{ #category : #'string-manipulation' }
+InstanceVariableFeatureSelector >> packageAllInatanceVariablesNamesAsBigrams: aPackageName [
+	"get all instance variables in a Package"
+		|instancesAsBigrams|	
+	instancesAsBigrams := (self packageAllInatanceVariablesNames: aPackageName) collect: [ 
+			:instanceName | self nameToBigrams: instanceName].
+	
+	^ instancesAsBigrams asOrderedCollection flatCollect: [:ngram| ngram ]
+]
+
+{ #category : #'string-manipulation' }
+InstanceVariableFeatureSelector >> proposeBigrams: aConcept in: aPackage [
+	"Sort an Instance variable Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
+
+	| bigramsCollection bigramsWithOccurence |
+	bigramsCollection := self packageAllInatanceVariablesNamesAsBigrams: aPackage.
+	bigramsWithOccurence := bigramsCollection
+		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
+		thenCollect: [ :bigram | bigram ].
+	^ self SortedBigrams: bigramsWithOccurence
 ]
 
 { #category : #sorting }

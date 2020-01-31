@@ -7,14 +7,13 @@ Class {
 { #category : #sorting }
 MethodTermsFeatureSelector >> allMethodsInPackage: aPackageName [
 	"gets All Methods in a given Package"
-	
 	|methodsCollection packageClasses|
 	methodsCollection := OrderedCollection new.
 	packageClasses := self packageAllClassesNames: aPackageName.
 	packageClasses do:[ :each|
 		methodsCollection add: (self classAllMethodsNames: each asClass)	
 		].
-	^methodsCollection
+	^methodsCollection flatCollect: [ :aMethod | aMethod]
 ]
 
 { #category : #'string-manipulation' }
@@ -46,6 +45,28 @@ MethodTermsFeatureSelector >> initialize [
 ]
 
 { #category : #sorting }
+MethodTermsFeatureSelector >> packageAllMethodsNamesAsBigrams: aPackageName [
+		"get all instance variables in a Package"
+		|methodsAsBigrams|	
+	methodsAsBigrams := (self allMethodsInPackage: aPackageName) collect: [ 
+			:instanceName | self nameToBigrams: instanceName].
+	
+	^ methodsAsBigrams asOrderedCollection flatCollect: [:ngram| ngram ]
+]
+
+{ #category : #sorting }
+MethodTermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
+	"Sort an Instance variable Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
+
+	| bigramsCollection bigramsWithOccurence |
+	bigramsCollection := self packageAllMethodsNamesAsBigrams: aPackage.
+	bigramsWithOccurence := bigramsCollection
+		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
+		thenCollect: [ :bigram | bigram ].
+	^ self SortedBigrams: bigramsWithOccurence
+]
+
+{ #category : #sorting }
 MethodTermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
 	
 	"Sort a given method name concept campared to other methods concepts in the same package."
@@ -69,7 +90,7 @@ MethodTermsFeatureSelector >> splitAllPackageMethodsNames: aPackageName [
 	
 	| aPackageAllMethodsNames |
 	aPackageAllMethodsNames := (self
-		allMethodsInPackage: aPackageName) flatCollect: [:methodName| methodName].
+		allMethodsInPackage: aPackageName).
 	^ aPackageAllMethodsNames
 		collect: [ :methodName | self splitName: methodName ]
 ]
