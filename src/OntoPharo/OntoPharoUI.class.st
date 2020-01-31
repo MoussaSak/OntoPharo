@@ -21,7 +21,8 @@ Class {
 		'methodTFS',
 		'instanceVariableConceptPresenter',
 		'instanceVariableNameSuggestion',
-		'aClass'
+		'aClass',
+		'bgramClassSuggestionPresenter'
 	],
 	#classInstVars : [
 		'refresher',
@@ -43,7 +44,8 @@ OntoPharoUI class >> defaultSpec [
 				add: #methodListPresenter ;
 				add: #instanceVariablePresenter;
 				add: #conceptListPresenter;
-				add: #suggestionPresenter;			
+				add: #suggestionPresenter;
+				add: #bgramClassSuggestionPresenter;			
 				yourself);
 		add:
 			(SpBoxLayout newHorizontal 
@@ -96,17 +98,19 @@ OntoPharoUI class >> title [
 	^'OntoPharo'
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoUI >> buttonHandler [
-			"handels the button work"
-			|newName selectedSuggestion selectedConcept selectedClass |
-			selectedSuggestion := suggestionPresenter displayValueAt: (suggestionPresenter selection selectedIndex).
-			selectedConcept := conceptListPresenter displayValueAt: (conceptListPresenter selection selectedIndex).
-			
-			selectedClass := classListPresenter displayValueAt: (classListPresenter selection selectedIndex).
-			newName := self replaceConcept: selectedConcept with: selectedSuggestion. 
-			
-			^ self refactorClassName: selectedClass to: newName.
+	"handels the button work"
+
+	| newName selectedSuggestion selectedConcept selectedClass |
+	selectedConcept := self getSelectedConcept.
+	selectedSuggestion := self getSelectedSuggestion.
+	selectedClass := classListPresenter
+		displayValueAt: classListPresenter selection selectedIndex.
+	newName := self
+		replaceConcept: selectedConcept
+		with: selectedSuggestion.
+	^ self refactorClassName: selectedClass to: newName
 ]
 
 { #category : #accessing }
@@ -142,14 +146,18 @@ OntoPharoUI >> connectPresenters [
 		transmitTo: suggestionPresenter
 		transform: self proposeSuggestions
 		postTransmission: [ :destination | destination selectIndex: 1 ] .
+	conceptListPresenter 
+		transmitTo: bgramClassSuggestionPresenter 
+		transform: self proposeBigramsSuggestions 
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 		
 	button
 		action: [ self buttonHandler ]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoUI >> extractClasses [
-
+	"Extract Classes from the selected Package"
 	^ [ :aPackageName | 	
 		aPackage := ((aPackageName asSymbol) asPackage).	
 		self classes: ( aPackage classes asOrderedCollection).
@@ -157,25 +165,42 @@ OntoPharoUI >> extractClasses [
 		]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoUI >> extractConcepts [
+	"Extract Classes Names Concepts"
 	^ [ :selectedClass | 
 	
 	aClass := selectedClass.
 	tfs splitName: aClass name asString ]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoUI >> extractInstanceVariables [
+	"Extract Instance Variables from a Class"
 	^ [ :selectedClass | 
 	instanceVariableTFS classInstanceVariables: selectedClass ]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoUI >> extractMethods [
+	"Extract Methods from a given Class"
 	^ [ :selectedClass | 
 	methodTFS classAllMethodsNames: selectedClass]	
 
+]
+
+{ #category : #api }
+OntoPharoUI >> getSelectedConcept [
+	"Get the selected Concept fril the conceptListPrenter"
+	^ conceptListPresenter
+		displayValueAt: conceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoUI >> getSelectedSuggestion [
+	"get the selected suggestion from the suggestionPreseneter"
+	^ suggestionPresenter
+		displayValueAt: suggestionPresenter selection selectedIndex
 ]
 
 { #category : #initialization }
@@ -190,6 +215,7 @@ OntoPharoUI >> initializePresenters [
 	instanceVariablePresenter := self newList headerTitle: 'Instance Variables Names'.
 	conceptListPresenter := self newList headerTitle: 'Class Name Concepts'.
 	suggestionPresenter := self newList headerTitle: 'Class Name Suggestions'.
+	bgramClassSuggestionPresenter := self newList headerTitle: 'Class Name Bgram Suggestions'.
 	questionLabel := self newLabel label: 'Do you want to apply the suggestion ?!'.
 	button := self newButton label: 'Apply Suggestion'.
 	
@@ -204,7 +230,7 @@ OntoPharoUI >> initializePresenters [
 
 { #category : #accessing }
 OntoPharoUI >> packages: aList [
-
+	
 	packageListPresenter items = aList
 	
 		ifTrue: [ ^ self ].
@@ -213,8 +239,22 @@ OntoPharoUI >> packages: aList [
 		selectIndex: 1
 ]
 
-{ #category : #initialization }
+{ #category : #api }
+OntoPharoUI >> proposeBigramsSuggestions [
+	"Propose Bigrams suggestions"
+	^ [ :aConcept | 
+		(tfs proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
+		(index history last, index last)
+		 ]
+		]
+		
+		
+	
+]
+
+{ #category : #api }
 OntoPharoUI >> proposeSuggestions [
+	"Propose class Name suggestion based on the other classes concepts names"
 	^ [ :aConcept | 
 		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
 			collect: #key ]
@@ -232,7 +272,7 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
 
 	"This method replaces the selected concept in the tables with the selected suggestion"
@@ -245,6 +285,7 @@ OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [
 OntoPharoUI >> selectClass: selectedClass [
 
 	"Selects a Class in the UI."
+	
 	| classIndex|
 	self selectPackage: selectedClass.
 	classIndex := (classListPresenter items indexOf: selectedClass ifAbsent: [ self error: ('Class {1} not found' format: { selectedClass name }) ]).
@@ -252,15 +293,8 @@ OntoPharoUI >> selectClass: selectedClass [
 ]
 
 { #category : #initialization }
-OntoPharoUI >> selectClassNamed: aName [
-
-	| index |
-	index := (classListPresenter items  indexOf: aName ifAbsent: [^ self ]).
-	classListPresenter clickAtIndex: index. 
-]
-
-{ #category : #initialization }
 OntoPharoUI >> selectMethod: aMethod [
+
 	"Selects a Method in the UI."
 
 	| aMethodName methodIndex|
@@ -271,11 +305,11 @@ OntoPharoUI >> selectMethod: aMethod [
 ]
 
 { #category : #initialization }
-OntoPharoUI >> selectPackage: aClass [
+OntoPharoUI >> selectPackage: selectedClass [
 
 	"Selects aClass in the UI."
 	| packageIndex|
 	
-	packageIndex := (packageListPresenter items indexOf: (aClass package name asString)  ifAbsent: [ self error: ('Package {1} not found' format: { aClass package name }) ]).
+	packageIndex := (packageListPresenter items indexOf: (selectedClass package name asString)  ifAbsent: [ self error: ('Package {1} not found' format: { selectedClass package name }) ]).
 	packageListPresenter clickAtIndex: packageIndex.
 ]

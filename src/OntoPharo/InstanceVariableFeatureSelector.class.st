@@ -46,7 +46,7 @@ InstanceVariableFeatureSelector >> packageAllInatanceVariablesNames: aPackageNam
 { #category : #sorting }
 InstanceVariableFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
 
-	"Sort a Instance Variable Concept compared to other Instance Variables concepts in a given Package by Levenstein distance returning a key/value collection "
+	"Sort an Instance Variable Concept compared to other Instance Variables concepts in a given Package by Levenstein distance returning a key/value collection "
 	
 	| aPackageIVConceptsCollection levenshteinCollection|
 	aPackageIVConceptsCollection := self collectAllInstanceVariablesConcepts: aPackage.

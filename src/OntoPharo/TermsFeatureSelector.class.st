@@ -10,6 +10,15 @@ Class {
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
+{ #category : #'as yet unclassified' }
+TermsFeatureSelector >> SortedBigrams: bigramsWithOccurence [
+	| bgramsWithValues |
+	bgramsWithValues := bigramsWithOccurence asBag valuesAndCounts
+		asOrderedDictionary.
+	bgramsWithValues sortAssociations: [ :a :b | a value > b value ].
+	^ bgramsWithValues keys
+]
+
 { #category : #sorting }
 TermsFeatureSelector >> collectAllConcepts: aPackage [
 	"Return all the concepts from Class names in aPackage."
@@ -27,12 +36,45 @@ TermsFeatureSelector >> initialize [
 	termsMeasurments := TermsMeasurements new
 ]
 
+{ #category : #'as yet unclassified' }
+TermsFeatureSelector >> nameToBigrams: aName [
+
+	"Transform a Name to a Collection of bigrams"
+	|collectionOfConcepts|
+	collectionOfConcepts := self splitName: aName.
+	
+	^ collectionOfConcepts bigrams asOrderedCollection 
+]
+
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> packageAllClassesNames: aPackageName [
 	"get all classes Names from a Package Name"
 	
 	allClassesNames := (RPackageOrganizer default packageNamed: aPackageName) definedClassNames.
 	^ allClassesNames asOrderedCollection
+]
+
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> packageAllClassesNamesAsBigrams: aPackageName [
+	"get all classes Names from a Package Name as Bigrams"
+		|classesAsBigrams|	
+	classesAsBigrams := (self packageAllClassesNames: aPackageName) collect: [ 
+			:aClassName | self nameToBigrams: aClassName
+		 ].
+	
+	^ classesAsBigrams asOrderedCollection flatCollect: [:ngram| ngram  ]
+]
+
+{ #category : #'as yet unclassified' }
+TermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
+	"Sort a Class Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
+
+	| bigramsCollection bigramsWithOccurence |
+	bigramsCollection := self packageAllClassesNamesAsBigrams: aPackage.
+	bigramsWithOccurence := bigramsCollection
+		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
+		thenCollect: [ :bigram | bigram ].
+	^ self SortedBigrams: bigramsWithOccurence
 ]
 
 { #category : #sorting }
@@ -54,7 +96,7 @@ TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
 		collect: [ :anotherConcept | 
 			aConcept size = anotherConcept size
 				ifTrue: [ termsMeasurments hammingDistanceOf: aConcept with: anotherConcept ]
-				ifFalse: [ 6 ] ].
+				ifFalse: [ #() ] ].
 	dictionary := OrderedDictionary
 		newFromKeys: aPackageConcepsCollection
 		andValues: hammingCollection.
