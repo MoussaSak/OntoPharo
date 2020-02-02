@@ -15,6 +15,7 @@ BaselineOfOntoPharo >> baseline: spec [
 		do: [ "dependencies"
 			self loadPolyglot: spec.
 			self loadIdentifierNameSplitter: spec.
+			self loadNgram: spec.
 			"Packages"
 			spec
 				package: 'OntoPharo';
@@ -27,6 +28,14 @@ BaselineOfOntoPharo >> loadIdentifierNameSplitter: spec [
 		spec
 			baseline: 'IdentifierNameSplitter'
 			with: [ spec repository: 'github://olekscode/IdentifierNameSplitter/src' ] ]
+]
+
+{ #category : #'as yet unclassified' }
+BaselineOfOntoPharo >> loadNgram: spec [
+	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
+		spec
+			baseline: 'Ngram'
+			with: [ spec repository: 'github://PharoAI/Ngram/src' ] ]
 ]
 
 { #category : #'as yet unclassified' }

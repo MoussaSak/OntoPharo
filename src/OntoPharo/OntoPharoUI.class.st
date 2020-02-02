@@ -41,8 +41,8 @@ OntoPharoUI class >> defaultSpec [
 			(SpBoxLayout newHorizontal 
 				add: #packageListPresenter ;
 				add: #classListPresenter;
-				add: #methodListPresenter ;
-				add: #instanceVariablePresenter;
+				"add: #methodListPresenter ;
+				add: #instanceVariablePresenter;"
 				add: #conceptListPresenter;
 				add: #suggestionPresenter;
 				add: #bgramClassSuggestionPresenter;			
@@ -282,7 +282,6 @@ OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [
 
 { #category : #initialization }
 OntoPharoUI >> selectClass: selectedClass [
-
 	"Selects a Class in the UI."
 	
 	| classIndex|
