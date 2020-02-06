@@ -16,6 +16,7 @@ BaselineOfOntoPharo >> baseline: spec [
 			self loadPolyglot: spec.
 			self loadIdentifierNameSplitter: spec.
 			self loadNgram: spec.
+			self loadNeoCSV: spec.
 			"Packages"
 			spec
 				package: 'OntoPharo';
@@ -28,6 +29,14 @@ BaselineOfOntoPharo >> loadIdentifierNameSplitter: spec [
 		spec
 			baseline: 'IdentifierNameSplitter'
 			with: [ spec repository: 'github://olekscode/IdentifierNameSplitter/src' ] ]
+]
+
+{ #category : #'as yet unclassified' }
+BaselineOfOntoPharo >> loadNeoCSV: spec [
+	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
+		spec
+			baseline: 'NeoCSV'
+			with: [ spec repository: 'github://svenvc/NeoCSV/repository' ] ]
 ]
 
 { #category : #'as yet unclassified' }

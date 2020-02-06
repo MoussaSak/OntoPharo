@@ -19,10 +19,27 @@ TermsFeatureSelector >> SortedBigrams: bigramsWithOccurence [
 	^ bgramsWithValues keys
 ]
 
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> classAllMethodsNames: aClass [
+	"get all Methods Names from a Class"
+
+	allMethodsNames := aClass methods asOrderedCollection collect: [ :methodName|
+	methodName name withoutPrefix: (aClass name asString),'>>#' ].
+	^ allMethodsNames
+]
+
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> classInstanceVariables: aClass [
+	"get all Instance Variables Names from a Class"
+
+	allInstanceVariables := aClass instVarNames asOrderedCollection
+		collect: [ :instanceName | instanceName asString ] .
+	^ allInstanceVariables 
+]
+
 { #category : #sorting }
 TermsFeatureSelector >> collectAllConcepts: aPackage [
 	"Return all the concepts from Class names in aPackage."
-
 	| collection conceptsCollection |
 	collection := Set new.
 	conceptsCollection := self splitAllPackageClassesNames: aPackage.
@@ -143,6 +160,21 @@ TermsFeatureSelector >> splitAllPackageClassesNames: aPackageName [
 ]
 
 { #category : #'string-manipulation' }
+TermsFeatureSelector >> splitAllSystemClassesNames [
+
+	| systemAllClassesNames |
+	systemAllClassesNames := self systemAllClasses collect: [:aClass | aClass name].
+	^ systemAllClassesNames
+		collect: [ :className | self splitName: className ]
+]
+
+{ #category : #'string-manipulation' }
 TermsFeatureSelector >> splitName: aClassName [
 	^aClassName splitIdentifierName
+]
+
+{ #category : #'string-manipulation' }
+TermsFeatureSelector >> systemAllClasses [
+	
+^ Smalltalk globals allClasses
 ]

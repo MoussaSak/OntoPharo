@@ -4,15 +4,6 @@ Class {
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
-{ #category : #'string-manipulation' }
-InstanceVariableFeatureSelector >> classInstanceVariables: aClass [
-	"get all Instance Variables Names from a Class"
-
-	allInstanceVariables := aClass instVarNames asOrderedCollection
-		collect: [ :instanceName | instanceName asString ] .
-	^ allInstanceVariables 
-]
-
 { #category : #sorting }
 InstanceVariableFeatureSelector >> collectAllInstanceVariablesConcepts: aPackage [
 	"Return all Instance Variables concepts  in a given Package."
@@ -37,7 +28,7 @@ InstanceVariableFeatureSelector >> packageAllInatanceVariablesNames: aPackageNam
 	instanceCollection := OrderedCollection new.
 	packageClasses := self packageAllClassesNames: aPackageName .
 	packageClasses do:[ :className|
-		instanceCollection add: (self classInstanceVariables: className asClass)	
+		instanceCollection add: (self classInstanceVariables: (self class environment at: className asSymbol) )	
 		].
 	^instanceCollection flatCollect: [ :instanceName| instanceName ]
 ]

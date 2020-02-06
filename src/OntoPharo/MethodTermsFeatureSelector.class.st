@@ -16,15 +16,6 @@ MethodTermsFeatureSelector >> allMethodsInPackage: aPackageName [
 	^methodsCollection flatCollect: [ :aMethod | aMethod]
 ]
 
-{ #category : #'string-manipulation' }
-MethodTermsFeatureSelector >> classAllMethodsNames: aClass [
-	"get all Methods Names from a Class"
-
-	allMethodsNames := aClass methods asOrderedCollection collect: [ :methodName|
-	methodName name withoutPrefix: (aClass name asString),'>>#' ].
-	^ allMethodsNames
-]
-
 { #category : #sorting }
 MethodTermsFeatureSelector >> collectAllMethodConcepts: aPackageName [
 

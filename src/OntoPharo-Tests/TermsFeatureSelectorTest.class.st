@@ -12,7 +12,7 @@ Class {
 
 { #category : #running }
 TermsFeatureSelectorTest >> setUp [
-	| trainPackage |
+	
 	tfs := TermsFeatureSelector new.
 	
 ]
