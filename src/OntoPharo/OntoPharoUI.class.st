@@ -271,41 +271,33 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
 
 	"This method replaces the selected concept in the tables with the selected suggestion"
-			|selectedClass |
-			selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).
-			^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
+	| selectedClass |
+	selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).
+	^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
 ]
 
 { #category : #initialization }
 OntoPharoUI >> selectClass: selectedClass [
 	"Selects a Class in the UI."
 	
-	| classIndex|
-	self selectPackage: selectedClass.
-	classIndex := (classListPresenter items indexOf: selectedClass ifAbsent: [ 0 ]).
-	classIndex isZero
-		ifFalse: [ classListPresenter clickAtIndex: classIndex ]
+	self selectPackage: selectedClass package.
+	classListPresenter selectItem: selectedClass
 ]
 
 { #category : #initialization }
 OntoPharoUI >> selectMethod: aMethod [
-
 	"Selects a Method in the UI."
-
-	| aMethodName methodIndex|
+ 
+	| aMethodName |
 	self selectClass: aMethod methodClass.
-	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString ), '>>#'.
-	methodIndex := (methodListPresenter items indexOf: aMethodName ifAbsent: [ 0 ]).
-	methodIndex isZero
-		ifFalse: [ methodListPresenter selectIndex: methodIndex ]
+	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString), '>>#'.
+	methodListPresenter selectItem: aMethodName
 ]
 
 { #category : #initialization }
-OntoPharoUI >> selectPackage: selectedClass [
+OntoPharoUI >> selectPackage: selectedPackage [
 	"Selects aClass in the UI."
 	
-	| packageIndex |
-	packageIndex := (packageListPresenter items indexOf: (selectedClass package name asString) ifAbsent: [ 0 ]).
-	packageIndex isZero ifFalse: [  
-		packageListPresenter clickAtIndex: packageIndex ]
+	packageListPresenter selectItem: selectedPackage packageName 
+
 ]

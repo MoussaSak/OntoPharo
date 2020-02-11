@@ -115,9 +115,8 @@ OntoPharoMethodUI >> initializePresenter [
 OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
-		(methodTFS proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
-		(index history last, index last)
-		 ]
+		(methodTFS proposeBigrams: aConcept in: (aPackage name)) 
+			collect: [ :index | index history last, index last ]
 		]
 ]
 
