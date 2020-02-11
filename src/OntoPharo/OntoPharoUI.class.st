@@ -159,7 +159,7 @@ OntoPharoUI >> extractClasses [
 	"Extract Classes from the selected Package"
 	^ [ :aPackageName | 	
 		aPackage := ((aPackageName asSymbol) asPackage).	
-		self classes: ( aPackage classes asOrderedCollection).
+		self classes: aPackage classes asOrderedCollection.
 		aPackage classes asOrderedCollection 
 		]
 ]
@@ -168,7 +168,6 @@ OntoPharoUI >> extractClasses [
 OntoPharoUI >> extractConcepts [
 	"Extract Classes Names Concepts"
 	^ [ :selectedClass | 
-	
 	aClass := selectedClass.
 	tfs splitName: aClass name asString ]
 ]
@@ -183,8 +182,7 @@ OntoPharoUI >> extractInstanceVariables [
 { #category : #api }
 OntoPharoUI >> extractMethods [
 	"Extract Methods from a given Class"
-	^ [ :selectedClass | 
-	methodTFS classAllMethodsNames: selectedClass]	
+	^ [ :selectedClass | methodTFS classAllMethodsNames: selectedClass]	
 
 ]
 
@@ -264,10 +262,8 @@ OntoPharoUI >> proposeSuggestions [
 
 { #category : #accessing }
 OntoPharoUI >> refactorClassName: aClassNamed to: newName [  
-
-"Refactoring class Name to a new Name"
-
-(RBRefactoryChangeFactory instance renameClass: aClassNamed asClass to: newName) execute
+	"Refactoring class Name to a new Name"
+	(RBRefactoryChangeFactory instance renameClass: aClassNamed asClass to: newName) execute
 
 ]
 
@@ -275,39 +271,33 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
 
 	"This method replaces the selected concept in the tables with the selected suggestion"
-			|selectedClass |
-			selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).
-			^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
+	| selectedClass |
+	selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).
+	^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
 ]
 
 { #category : #initialization }
 OntoPharoUI >> selectClass: selectedClass [
 	"Selects a Class in the UI."
 	
-	| classIndex|
-	self selectPackage: selectedClass.
-	classIndex := (classListPresenter items indexOf: selectedClass ifAbsent: [ self error: ('Class {1} not found' format: { selectedClass name }) ]).
-	classListPresenter clickAtIndex: classIndex.
+	self selectPackage: selectedClass package.
+	classListPresenter selectItem: selectedClass
 ]
 
 { #category : #initialization }
 OntoPharoUI >> selectMethod: aMethod [
-
 	"Selects a Method in the UI."
-
-	| aMethodName methodIndex|
-	self selectClass: (aMethod methodClass).
-	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString ),'>>#'.
-	methodIndex := (methodListPresenter items indexOf: aMethodName ifAbsent: [ self error: ('Method {1} not found' format: { aMethodName }) ]).
-	methodListPresenter selectIndex: methodIndex
+ 
+	| aMethodName |
+	self selectClass: aMethod methodClass.
+	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString), '>>#'.
+	methodListPresenter selectItem: aMethodName
 ]
 
 { #category : #initialization }
-OntoPharoUI >> selectPackage: selectedClass [
-
+OntoPharoUI >> selectPackage: selectedPackage [
 	"Selects aClass in the UI."
-	| packageIndex|
 	
-	packageIndex := (packageListPresenter items indexOf: (selectedClass package name asString)  ifAbsent: [ self error: ('Package {1} not found' format: { selectedClass package name }) ]).
-	packageListPresenter clickAtIndex: packageIndex.
+	packageListPresenter selectItem: selectedPackage packageName 
+
 ]
