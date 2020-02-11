@@ -282,8 +282,9 @@ OntoPharoUI >> selectClass: selectedClass [
 	
 	| classIndex|
 	self selectPackage: selectedClass.
-	classIndex := (classListPresenter items indexOf: selectedClass ifAbsent: [ ]).
-	classListPresenter clickAtIndex: classIndex.
+	classIndex := (classListPresenter items indexOf: selectedClass ifAbsent: [ 0 ]).
+	classIndex isZero
+		ifFalse: [ classListPresenter clickAtIndex: classIndex ]
 ]
 
 { #category : #initialization }
@@ -292,10 +293,11 @@ OntoPharoUI >> selectMethod: aMethod [
 	"Selects a Method in the UI."
 
 	| aMethodName methodIndex|
-	self selectClass: (aMethod methodClass).
+	self selectClass: aMethod methodClass.
 	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString ), '>>#'.
-	methodIndex := (methodListPresenter items indexOf: aMethodName ifAbsent: [ ]).
-	methodListPresenter selectIndex: methodIndex
+	methodIndex := (methodListPresenter items indexOf: aMethodName ifAbsent: [ 0 ]).
+	methodIndex isZero
+		ifFalse: [ methodListPresenter selectIndex: methodIndex ]
 ]
 
 { #category : #initialization }
@@ -303,7 +305,7 @@ OntoPharoUI >> selectPackage: selectedClass [
 	"Selects aClass in the UI."
 	
 	| packageIndex |
-	packageIndex := (packageListPresenter items indexOf: (selectedClass package name asString)  
-								ifAbsent: [ "self error: ('Package {1} not found' format: { selectedClass package name })" ]).
-	packageListPresenter clickAtIndex: packageIndex.
+	packageIndex := (packageListPresenter items indexOf: (selectedClass package name asString) ifAbsent: [ 0 ]).
+	packageIndex isZero ifFalse: [  
+		packageListPresenter clickAtIndex: packageIndex ]
 ]
