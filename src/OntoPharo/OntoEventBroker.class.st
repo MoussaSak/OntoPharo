@@ -49,7 +49,7 @@ OntoEventBroker >> handleMethodModified: anEvent [
 { #category : #initialization }
 OntoEventBroker >> handleMethodRemoved: anEvent [
 
- ui do: [:each | each selectClass: anEvent classAffected ].	
+	ui do: [:each | each selectClass: anEvent classAffected ]
 
 ]
 
