@@ -26,7 +26,7 @@ Class {
 	#category : #'OntoPharo-Model-Factory'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #ontologies }
 OntoModelFactory >> createOntoModelIn: aPath [
 	"Creates the Onto Model"
 	self initialize.
@@ -34,7 +34,7 @@ OntoModelFactory >> createOntoModelIn: aPath [
 	path asFileReference
 	writeStreamDo: [ :writeStream |
 		(NeoCSVWriter on: writeStream)
- 			writeHeader: #(ClassName Methods InstanceVariables);
+ 			writeHeader: #(id label subTypeOf enumerationType equivalentClass properties comment methods instanceVariables isPartOf);
 			nextPutAll: (data collect: #values )]
 ]
 
@@ -48,7 +48,7 @@ OntoModelFactory >> data: anObject [
 	data := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #ontologies }
 OntoModelFactory >> deleteOntoModel [
 	"Delete the Onto Model"
 	|file|
@@ -59,37 +59,49 @@ OntoModelFactory >> deleteOntoModel [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #ontologies }
 OntoModelFactory >> extractEntities [
 	"Extracts the Entities from the Model"
 	 ^model collect:  [ :each |
 		OrderedDictionary  newFrom: {  
-		#'ClassName' -> (each at:1).
-		#'Methods' -> (((each at: 2 ) notNil )
-							ifTrue:	[( (each at: 2))]
-							ifFalse: [ #() ]).
-		#'InstanceVariables' -> (((each at: 3) notNil )
-	ifTrue:	[(each at: 3)]
-	ifFalse: [#()]).}]	.
+		#'id' -> (each at:1).
+		#'label' -> (each at:2).
+		#'subTypeOf' -> (each at:3).
+		#'enumerationType' -> (each at:4).
+		#'equivalentClass' -> (each at:5).
+		#'properties' -> (each at:6).
+		#'comment' -> (each at:7).
+		#'methods' -> (each at: 8).
+		#'instanceVariables' -> (each at: 9).
+		#'isPartOf' -> (each at:10).
+	}]	.
 	
 	 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 OntoModelFactory >> initialize [ 
-	
-		tfs :=TermsFeatureSelector new.
+
+		tfs := TermsFeatureSelector new.
 		
 		data := tfs systemAllClasses collect: [:each| 
 		OrderedDictionary  newFrom: {  
-		#'ClassName' -> (each name asString).
-		#'Methods' -> (',' join:(tfs classAllMethodsNames: each)).
-		#'InstanceVariables' -> (',' join:(tfs classInstanceVariables: each)).}
+		#'id' -> ('').
+		#'label' -> (each name asString).
+		#'subTypeOf' -> (each superclass).
+		#'enumerationType'-> ('').
+		#'equivalentClass'-> ('').
+		#'properties' -> ('').
+		#'comment'-> ('').
+		#'methods' -> (',' join:(tfs classAllMethodsNames: each)).
+		#'instanceVariables' -> (',' join:(tfs classInstanceVariables: each)).
+		#'isPartOf' -> ('').
+		}
 		]
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #ontologies }
 OntoModelFactory >> loadOntoModel: aPath [
 	"Load the Onto Model"
 	self path: aPath.
@@ -102,12 +114,12 @@ OntoModelFactory >> loadOntoModel: aPath [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 OntoModelFactory >> model [ 
 	^model
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 OntoModelFactory >> model: aModel [
 	model := aModel 
 ]
@@ -122,10 +134,10 @@ OntoModelFactory >> path: anObject [
 	path := anObject
 ]
 
-{ #category : #'as yet unclassified' }
-OntoModelFactory >> updateOntoModel: newData [
-
+{ #category : #ontologies }
+OntoModelFactory >> updateOntoModel: aPath [
+	
+	path := aPath.
 	self deleteOntoModel.
-	self data: newData .
 	self createOntoModelIn: path
 ]

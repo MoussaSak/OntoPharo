@@ -10,7 +10,7 @@ Class {
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'n-grams' }
 TermsFeatureSelector >> SortedBigrams: bigramsWithOccurence [
 	| bgramsWithValues |
 	bgramsWithValues := bigramsWithOccurence asBag valuesAndCounts
@@ -53,7 +53,7 @@ TermsFeatureSelector >> initialize [
 	termsMeasurments := TermsMeasurements new
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'n-grams' }
 TermsFeatureSelector >> nameToBigrams: aName [
 
 	"Transform a Name to a Collection of bigrams"
@@ -63,7 +63,7 @@ TermsFeatureSelector >> nameToBigrams: aName [
 	^ collectionOfConcepts bigrams asOrderedCollection 
 ]
 
-{ #category : #'string-manipulation' }
+{ #category : #'classes and packages' }
 TermsFeatureSelector >> packageAllClassesNames: aPackageName [
 	"get all classes Names from a Package Name"
 	
@@ -82,7 +82,7 @@ TermsFeatureSelector >> packageAllClassesNamesAsBigrams: aPackageName [
 	^ classesAsBigrams asOrderedCollection flatCollect: [:ngram| ngram  ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'n-grams' }
 TermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	"Sort a Class Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
 
@@ -121,26 +121,11 @@ TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
 ]
 
 { #category : #sorting }
-TermsFeatureSelector >> sortConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
-	"Sort a Class Concept compared to other classes concepts in a given Package by Levenstein distance returning a key/value 	dictionary "
-		
-	| aPackageConcepsCollection levenshteinCollection dictionary |
-	aPackageConcepsCollection := self collectAllConcepts: aPackage.
-	levenshteinCollection := aPackageConcepsCollection
-		collect:
-			[ :anotherConcept | termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept ].
-	dictionary := OrderedDictionary
-		newFromKeys: aPackageConcepsCollection
-		andValues: levenshteinCollection.
-	^ dictionary sort
-]
-
-{ #category : #sorting }
 TermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
 	"Sort a Class Concept compared to other classes concepts in a given Package by Levenstein distance returning a key/value 	collection "
 	| aPackageConceptsCollection levenshteinCollection|
 	aPackageConceptsCollection := self collectAllConcepts: aPackage.
-	levenshteinCollection := aPackageConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept )] thenCollect: 
+	levenshteinCollection := aPackageConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept ) | ((termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) >= 3) ] thenCollect: 
 		 [ :anotherConcept| 
 			anotherConcept
 				->
@@ -173,8 +158,14 @@ TermsFeatureSelector >> splitName: aClassName [
 	^aClassName splitIdentifierName
 ]
 
-{ #category : #'string-manipulation' }
+{ #category : #'classes and packages' }
 TermsFeatureSelector >> systemAllClasses [
 	
 ^ Smalltalk globals allClasses
+]
+
+{ #category : #'classes and packages' }
+TermsFeatureSelector >> systemAllPackages [
+
+	^RPackageOrganizer default packages.
 ]

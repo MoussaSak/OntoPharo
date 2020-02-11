@@ -256,7 +256,7 @@ OntoPharoUI >> proposeSuggestions [
 	"Propose class Name suggestion based on the other classes concepts names"
 	^ [ :aConcept | 
 		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
-			collect: #key ]
+		"collect: #key" ]
 		
 		
 	
