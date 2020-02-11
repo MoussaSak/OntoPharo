@@ -1,10 +1,13 @@
+"
+am a terms feature selector am supposed to extract the handle the methods names, and propose suggestions based on the levenshteinDistance and on Bigrams.  
+"
 Class {
 	#name : #MethodTermsFeatureSelector,
 	#superclass : #TermsFeatureSelector,
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
-{ #category : #sorting }
+{ #category : #'string-manipulation' }
 MethodTermsFeatureSelector >> allMethodsInPackage: aPackageName [
 	"gets All Methods in a given Package"
 	|methodsCollection packageClasses|
@@ -16,7 +19,7 @@ MethodTermsFeatureSelector >> allMethodsInPackage: aPackageName [
 	^methodsCollection flatCollect: [ :aMethod | aMethod]
 ]
 
-{ #category : #sorting }
+{ #category : #'string-manipulation' }
 MethodTermsFeatureSelector >> collectAllMethodConcepts: aPackageName [
 
 	"Return all Methods Concepts within a given Package"
@@ -35,7 +38,7 @@ MethodTermsFeatureSelector >> initialize [
 	super initialize.
 ]
 
-{ #category : #sorting }
+{ #category : #'string-manipulation' }
 MethodTermsFeatureSelector >> packageAllMethodsNamesAsBigrams: aPackageName [
 		"get all instance variables in a Package"
 		|methodsAsBigrams|	
@@ -45,7 +48,7 @@ MethodTermsFeatureSelector >> packageAllMethodsNamesAsBigrams: aPackageName [
 	^ methodsAsBigrams asOrderedCollection flatCollect: [:ngram| ngram ]
 ]
 
-{ #category : #sorting }
+{ #category : #'n-grams' }
 MethodTermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	"Sort an Instance variable Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
 
@@ -74,7 +77,7 @@ MethodTermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in
 	^ self sort2DCollection: levenshteinCollection.
 ]
 
-{ #category : #sorting }
+{ #category : #'string-manipulation' }
 MethodTermsFeatureSelector >> splitAllPackageMethodsNames: aPackageName [
 
 	"Split all Methods names in a given Package "

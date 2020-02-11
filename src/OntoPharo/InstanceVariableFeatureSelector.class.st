@@ -1,10 +1,13 @@
+"
+am a terms feature selector am supposed to extract the handle the instance variables names, and propose suggestions based on the levenshteinDistance and on Bigrams.  
+"
 Class {
 	#name : #InstanceVariableFeatureSelector,
 	#superclass : #TermsFeatureSelector,
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
-{ #category : #sorting }
+{ #category : #'string-manipulation' }
 InstanceVariableFeatureSelector >> collectAllInstanceVariablesConcepts: aPackage [
 	"Return all Instance Variables concepts  in a given Package."
 	| collection conceptsCollection |
@@ -43,7 +46,7 @@ InstanceVariableFeatureSelector >> packageAllInatanceVariablesNamesAsBigrams: aP
 	^ instancesAsBigrams asOrderedCollection flatCollect: [:ngram| ngram ]
 ]
 
-{ #category : #'string-manipulation' }
+{ #category : #'n-grams' }
 InstanceVariableFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	"Sort an Instance variable Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
 

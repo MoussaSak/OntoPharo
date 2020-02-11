@@ -1,3 +1,6 @@
+"
+am a terms feature selector am supposed to extract the handle the classes names, and propose suggestions based on the levenshteinDistance and on Bigrams.  
+"
 Class {
 	#name : #TermsFeatureSelector,
 	#superclass : #Object,

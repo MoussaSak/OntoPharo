@@ -1,3 +1,8 @@
+"
+OntoPharo for methods name suggestions execute 
+
+	'OntoPharoMethodUI open' to run it. 
+"
 Class {
 	#name : #OntoPharoMethodUI,
 	#superclass : #OntoPharoUI,
@@ -40,7 +45,7 @@ OntoPharoMethodUI class >> title [
 	^'OntoPharoMethodUI'
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoMethodUI >> buttonHandler [
 	"handels the Button Work"
 
@@ -75,7 +80,7 @@ OntoPharoMethodUI >> connectPresenters [
 		action: [ self buttonHandler]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoMethodUI >> extractMethodConcepts [
 
 	^[:aMethodName|
@@ -86,13 +91,13 @@ OntoPharoMethodUI >> extractMethodConcepts [
 	 ]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoMethodUI >> getSelectedConcept [
 	^ methodConceptListPresenter
 		displayValueAt: methodConceptListPresenter selection selectedIndex
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoMethodUI >> getSelectedSuggestion [
 
 	^ methodSuggestionListPresenter
@@ -111,7 +116,7 @@ OntoPharoMethodUI >> initializePresenter [
 	
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
@@ -120,7 +125,7 @@ OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
 		]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoMethodUI >> proposeMethodSuggestions [
 		^ [ :aConcept | 
 	
@@ -130,13 +135,13 @@ OntoPharoMethodUI >> proposeMethodSuggestions [
 		
 ]
 
-{ #category : #initialization }
+{ #category : #refactoring }
 OntoPharoMethodUI >> refactorMethodName: aMethodName to: aNewName [ 
 	
 	(RBRenameMethodRefactoring renameMethod: aMethodName asSymbol in: aClass to: aNewName  permutation: (1 to: 0) ) execute.
 ]
 
-{ #category : #initialization }
+{ #category : #refactoring }
 OntoPharoMethodUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
 
 		"This method replaces the selected concept in the tables with the selected suggestion"

@@ -1,3 +1,6 @@
+"
+Am an Announcer, i follow the changes made on the system (Classes added or modified mothods added or removed )
+"
 Class {
 	#name : #OntoEventBroker,
 	#superclass : #Object,

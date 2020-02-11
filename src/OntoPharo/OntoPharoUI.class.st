@@ -260,14 +260,14 @@ OntoPharoUI >> proposeSuggestions [
 	
 ]
 
-{ #category : #accessing }
+{ #category : #refactoring }
 OntoPharoUI >> refactorClassName: aClassNamed to: newName [  
 	"Refactoring class Name to a new Name"
 	(RBRefactoryChangeFactory instance renameClass: aClassNamed asClass to: newName) execute
 
 ]
 
-{ #category : #api }
+{ #category : #refactoring }
 OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
 
 	"This method replaces the selected concept in the tables with the selected suggestion"
@@ -276,7 +276,7 @@ OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [
 	^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
 ]
 
-{ #category : #initialization }
+{ #category : #announcing }
 OntoPharoUI >> selectClass: selectedClass [
 	"Selects a Class in the UI."
 	
@@ -284,7 +284,7 @@ OntoPharoUI >> selectClass: selectedClass [
 	classListPresenter selectItem: selectedClass
 ]
 
-{ #category : #initialization }
+{ #category : #announcing }
 OntoPharoUI >> selectMethod: aMethod [
 	"Selects a Method in the UI."
  
@@ -294,7 +294,7 @@ OntoPharoUI >> selectMethod: aMethod [
 	methodListPresenter selectItem: aMethodName
 ]
 
-{ #category : #initialization }
+{ #category : #announcing }
 OntoPharoUI >> selectPackage: selectedPackage [
 	"Selects aClass in the UI."
 	

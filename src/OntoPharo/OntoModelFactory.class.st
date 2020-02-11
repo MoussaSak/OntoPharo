@@ -38,12 +38,12 @@ OntoModelFactory >> createOntoModelIn: aPath [
 			nextPutAll: (data collect: #values )]
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 OntoModelFactory >> data [
 	^ data
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 OntoModelFactory >> data: anObject [
 	data := anObject
 ]
@@ -114,22 +114,22 @@ OntoModelFactory >> loadOntoModel: aPath [
 	
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 OntoModelFactory >> model [ 
 	^model
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 OntoModelFactory >> model: aModel [
 	model := aModel 
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 OntoModelFactory >> path [
 	^ path
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 OntoModelFactory >> path: anObject [
 	path := anObject
 ]

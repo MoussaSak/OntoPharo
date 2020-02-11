@@ -1,3 +1,6 @@
+"
+am a terms Measurements, am using a set of metrics as: Hamming and Levenshtein distance, and the TF-IDF metric.
+"
 Class {
 	#name : #TermsMeasurements,
 	#superclass : #Object,

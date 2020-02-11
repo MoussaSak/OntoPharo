@@ -1,3 +1,8 @@
+"
+OntoPharo for instance variables name suggestions execute 
+
+	'OntoPharoInstanceVariableUI  open' to run it. 
+"
 Class {
 	#name : #OntoPharoInstanceVariableUI,
 	#superclass : #OntoPharoUI,
@@ -71,7 +76,7 @@ OntoPharoInstanceVariableUI >> connectPresenters [
 		action: [ self buttonHandler]
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoInstanceVariableUI >> extractInstanceVariableConcepts [
 	^ [ :instanceVariable | 
 	instanceVariable
@@ -103,7 +108,7 @@ OntoPharoInstanceVariableUI >> initializePresenters [
 	
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoInstanceVariableUI >> proposeInstancVariableBigramSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
@@ -114,7 +119,7 @@ OntoPharoInstanceVariableUI >> proposeInstancVariableBigramSuggestions [
 		
 ]
 
-{ #category : #initialization }
+{ #category : #api }
 OntoPharoInstanceVariableUI >> proposeInstancVariableSuggestions [
 
 		^ [ :aConcept | 
@@ -122,13 +127,13 @@ OntoPharoInstanceVariableUI >> proposeInstancVariableSuggestions [
 			collect: #key ] ifNil: [ #() ]]
 ]
 
-{ #category : #initialization }
+{ #category : #refactoring }
 OntoPharoInstanceVariableUI >> refactorInstanceVariableName: anInstanceName to: aNewName [
 
 	(RBRenameInstanceVariableRefactoring rename: anInstanceName to: aNewName in: aClass ) execute
 ]
 
-{ #category : #api }
+{ #category : #refactoring }
 OntoPharoInstanceVariableUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
 
 		"This method replaces the selected concept in the tables with the selected suggestion"
