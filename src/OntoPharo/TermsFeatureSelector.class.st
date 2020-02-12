@@ -107,20 +107,21 @@ TermsFeatureSelector >> sort2DCollection: a2DCollection [
 ]
 
 { #category : #sorting }
-TermsFeatureSelector >> sortConceptsByHammingDistanceOF: aConcept in: aPackage [
+TermsFeatureSelector >> sortedConceptsByHammingDistanceOF: aConcept in: aPackage [
 	"Sort a Class Concept compared to other classes concepts in a given Package by Hamming distance"
 
-	| aPackageConcepsCollection hammingCollection dictionary |
+	| aPackageConcepsCollection hammingCollection |
 	aPackageConcepsCollection := self collectAllConcepts: aPackage.
 	hammingCollection := aPackageConcepsCollection
-		collect: [ :anotherConcept | 
-			aConcept size = anotherConcept size
-				ifTrue: [ termsMeasurments hammingDistanceOf: aConcept with: anotherConcept ]
-				ifFalse: [ #() ] ].
-	dictionary := OrderedDictionary
-		newFromKeys: aPackageConcepsCollection
-		andValues: hammingCollection.
-	^ dictionary sort
+		reject: [ :anotherConcept | 
+			(anotherConcept sameAs: aConcept )|(aConcept size ~= anotherConcept size)
+			 ] 
+		thenCollect: [ :anotherConcept | 
+					anotherConcept
+						-> 
+							(termsMeasurments hammingDistanceOf: aConcept with: anotherConcept) ].
+
+	^ self sort2DCollection: hammingCollection.
 ]
 
 { #category : #sorting }

@@ -39,7 +39,7 @@ OntoPharoUI class >> defaultSpec [
 	
 		add:
 			(SpBoxLayout newHorizontal 
-				add: #packageListPresenter ;
+			add: #packageListPresenter ;
 				add: #classListPresenter;
 				"add: #methodListPresenter ;
 				add: #instanceVariablePresenter;"
@@ -130,14 +130,6 @@ OntoPharoUI >> connectPresenters [
 		transform: self extractClasses
 		postTransmission: [ :destination | destination selectIndex: 1 ]. 	
 	classListPresenter
-		transmitTo: methodListPresenter
-		transform: self extractMethods
-		postTransmission: [ :destination | destination selectIndex: 1 ].
-	classListPresenter
-		transmitTo: instanceVariablePresenter
-		transform: self extractInstanceVariables
-		postTransmission: [ :destination | destination selectIndex: 1 ].
-	classListPresenter
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
 		postTransmission: [ :destination | destination selectIndex: 1 ].
@@ -157,33 +149,46 @@ OntoPharoUI >> connectPresenters [
 { #category : #api }
 OntoPharoUI >> extractClasses [
 	"Extract Classes from the selected Package"
-	^ [ :aPackageName | 	
+	^ [ :aPackageName | 
+		aPackageName 
+		ifNotNil: [ 
 		aPackage := ((aPackageName asSymbol) asPackage).	
 		self classes: aPackage classes asOrderedCollection.
-		aPackage classes asOrderedCollection 
-		]
+		aPackage classes asOrderedCollection ]
+		ifNil: [ #() ] ]
+	
 ]
 
 { #category : #api }
 OntoPharoUI >> extractConcepts [
 	"Extract Classes Names Concepts"
 	^ [ :selectedClass | 
-	aClass := selectedClass.
-	tfs splitName: aClass name asString ]
+	selectedClass 
+	ifNotNil: [ 
+		aClass := selectedClass.
+		tfs splitName: aClass name asString ]
+	ifNil:[ #() ] ]
+
 ]
 
 { #category : #api }
 OntoPharoUI >> extractInstanceVariables [
 	"Extract Instance Variables from a Class"
 	^ [ :selectedClass | 
+	selectedClass 
+	ifNotNil: [ 
 	instanceVariableTFS classInstanceVariables: selectedClass ]
+	ifNil: [ #() ] ]
 ]
 
 { #category : #api }
 OntoPharoUI >> extractMethods [
 	"Extract Methods from a given Class"
-	^ [ :selectedClass | methodTFS classAllMethodsNames: selectedClass]	
-
+	^ [ :selectedClass | 
+		selectedClass 
+		ifNotNil:[
+		methodTFS classAllMethodsNames: selectedClass]	
+		ifNil: [ #() ] ]
 ]
 
 { #category : #api }
@@ -208,8 +213,8 @@ OntoPharoUI >> initializePresenters [
 	instanceVariableTFS := InstanceVariableFeatureSelector new.
 	packageListPresenter := self newList headerTitle: 'Packages'.
 	classListPresenter := self newList headerTitle: 'Class Names'.
-	methodListPresenter := self newList headerTitle: 'Methods Names'.
 	instanceVariablePresenter := self newList headerTitle: 'Instance Variables Names'.
+	methodListPresenter := self newList headerTitle: 'Methods Names'.
 	conceptListPresenter := self newList headerTitle: 'Class Name Concepts'.
 	suggestionPresenter := self newList headerTitle: 'Class Name Suggestions'.
 	bgramClassSuggestionPresenter := self newList headerTitle: 'Class Name Bgram Suggestions'.
@@ -240,9 +245,11 @@ OntoPharoUI >> packages: aList [
 OntoPharoUI >> proposeBigramsSuggestions [
 	"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
+		aPackage 
+		ifNotNil:[
 		(tfs proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
-		(index history last, index last)
-		 ]
+		(index history last, index last)]]
+		ifNil:[#()]
 		]
 		
 		
@@ -253,9 +260,11 @@ OntoPharoUI >> proposeBigramsSuggestions [
 OntoPharoUI >> proposeSuggestions [
 	"Propose class Name suggestion based on the other classes concepts names"
 	^ [ :aConcept | 
+		aPackage 
+		ifNotNil:[
 		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
-		"collect: #key" ]
-		
+		collect: #key ]
+		ifNil: [ #() ] ]
 		
 	
 ]
@@ -282,6 +291,7 @@ OntoPharoUI >> selectClass: selectedClass [
 	
 	self selectPackage: selectedClass package.
 	classListPresenter selectItem: selectedClass
+	
 ]
 
 { #category : #announcing }
@@ -289,15 +299,17 @@ OntoPharoUI >> selectMethod: aMethod [
 	"Selects a Method in the UI."
  
 	| aMethodName |
+	
 	self selectClass: aMethod methodClass.
 	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString), '>>#'.
 	methodListPresenter selectItem: aMethodName
+	
 ]
 
 { #category : #announcing }
 OntoPharoUI >> selectPackage: selectedPackage [
 	"Selects aClass in the UI."
 	
-	packageListPresenter selectItem: selectedPackage packageName 
+	packageListPresenter selectItem: selectedPackage packageName.
 
 ]

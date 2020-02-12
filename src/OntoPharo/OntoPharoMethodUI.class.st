@@ -41,6 +41,23 @@ OntoPharoMethodUI class >> defaultSpec [
 ]
 
 { #category : #specs }
+OntoPharoMethodUI class >> open [
+	"self open"
+	<script>
+	
+	| presenter windowPresenter |
+	presenter := self new. 
+	"presenter packages: RPackageOrganizer default packages."
+	windowPresenter := presenter openWithSpec.
+	windowPresenter whenClosedDo: [ 
+		self killRefresh. 
+		self refresher uiList remove: instance].
+	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
+	windowPresenter window extent: 1000@600.
+	^ windowPresenter
+]
+
+{ #category : #specs }
 OntoPharoMethodUI class >> title [ 
 	^'OntoPharoMethodUI'
 ]
@@ -63,6 +80,10 @@ OntoPharoMethodUI >> connectPresenters [
 
 	super connectPresenters.
 	
+	classListPresenter
+	transmitTo: methodListPresenter
+	transform: self extractMethods
+	postTransmission: [ :destination | destination selectIndex: 1 ].
 	methodListPresenter
 	transmitTo: methodConceptListPresenter 
 	transform: self extractMethodConcepts
@@ -108,7 +129,6 @@ OntoPharoMethodUI >> getSelectedSuggestion [
 OntoPharoMethodUI >> initializePresenter [
 
 	super initializePresenter.
-	
 	methodConceptListPresenter := self newList headerTitle: 'Method Name Concepts'.
 	methodSuggestionListPresenter := self newList  headerTitle: 'Method name Suggestions'.
 	methodBigramSuggestionListPresenter := self newList headerTitle: 'Method name Bigrams Suggestions'
@@ -120,9 +140,11 @@ OntoPharoMethodUI >> initializePresenter [
 OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
+		
+		aConcept ifNotNil: [ 
 		(methodTFS proposeBigrams: aConcept in: (aPackage name)) 
 			collect: [ :index | index history last, index last ]
-		]
+		]ifNil: [ #() ] ].
 ]
 
 { #category : #api }
@@ -148,4 +170,19 @@ OntoPharoMethodUI >> replaceConcept: selectedConcept with: selectedSuggestion [
 			|selectedMethod |
 			selectedMethod := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
 			^ selectedMethod copyReplaceAll: selectedConcept with: selectedSuggestion.   
+]
+
+{ #category : #announcing }
+OntoPharoMethodUI >> selectMethod: aMethod [
+	"Selects a Method in the UI."
+ 
+	| aMethodName |
+	
+	aPackage := (aMethod methodClass) package.
+	aClass := aMethod methodClass.
+	self packages: RPackageOrganizer default packages.
+	self selectClass: aMethod methodClass.
+	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString), '>>#'.
+	methodListPresenter selectItem: aMethodName
+	
 ]

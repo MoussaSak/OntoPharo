@@ -20,24 +20,28 @@ OntoEventBroker >> addUI: aUI [
 OntoEventBroker >> handleClassAdded: anEvent [
 
 	ui do: [:each | each selectPackage: anEvent packageAffected].
+	ui do: [:each | each selectClass:  anEvent classAffected ].
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleClassModified: anEvent [
 
 	ui do: [:each | each selectPackage: anEvent packageAffected].
+	ui do: [:each | each selectClass:  anEvent classAffected ].
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleClassRemoved: anEvent [
 
 	ui do: [:each | each selectPackage: anEvent packageAffected].
+	ui do: [:each | each selectClass:  anEvent classAffected ].
 ]
 
 { #category : #initialization }
 OntoEventBroker >> handleMethodAdded: anEvent [
 	
 	ui do: [:each | each selectClass: anEvent classAffected ].
+	ui do: [ :each | each selectMethod: anEvent methodAffected].
 ]
 
 { #category : #initialization }
@@ -52,7 +56,8 @@ OntoEventBroker >> handleMethodModified: anEvent [
 { #category : #initialization }
 OntoEventBroker >> handleMethodRemoved: anEvent [
 
-	ui do: [:each | each selectClass: anEvent classAffected ]
+	ui do: [:each | each selectClass: anEvent classAffected ].
+	ui do: [ :each | each selectMethod: anEvent methodAffected].	
 
 ]
 
@@ -61,7 +66,7 @@ OntoEventBroker >> initialize [
 	super initialize.
 	self initializeAnnouncements.
 	ui := OrderedCollection new.
-	Transcript show: 'I was Called'
+	
 ]
 
 { #category : #initialization }

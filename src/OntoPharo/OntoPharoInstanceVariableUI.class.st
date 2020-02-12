@@ -37,6 +37,24 @@ OntoPharoInstanceVariableUI class >> defaultSpec [
 ]
 
 { #category : #specs }
+OntoPharoInstanceVariableUI class >> open [
+
+	"self open"
+	<script>
+	
+	| presenter windowPresenter |
+	presenter := self new. 
+	"presenter packages: RPackageOrganizer default packages."
+	windowPresenter := presenter openWithSpec.
+	windowPresenter whenClosedDo: [ 
+		self killRefresh. 
+		self refresher uiList remove: instance].
+	"windowPresenter whenClosedDo: presenter getWhenClosedBlock."
+	windowPresenter window extent: 1000@600.
+	^ windowPresenter
+]
+
+{ #category : #specs }
 OntoPharoInstanceVariableUI class >> title [ 
 	^'OntoPharoInstanceVariableUI'
 ]
@@ -58,7 +76,10 @@ OntoPharoInstanceVariableUI >> buttonHandler [
 OntoPharoInstanceVariableUI >> connectPresenters [
 
 	super connectPresenters.
-
+	classListPresenter
+	transmitTo: instanceVariablePresenter
+	transform: self extractInstanceVariables
+	postTransmission: [ :destination | destination selectIndex: 1 ].	
 	instanceVariablePresenter
 	transmitTo: instanceVariableConceptPresenter
 	transform: self extractInstanceVariableConcepts 
@@ -101,6 +122,7 @@ OntoPharoInstanceVariableUI >> getSelectedSuggestion [
 
 { #category : #initialization }
 OntoPharoInstanceVariableUI >> initializePresenters [ 
+
 	super initializePresenters.
 	instanceVariableConceptPresenter := self newList headerTitle:  'Instance Variable Concepts'.
 	instanceVariableNameSuggestion := self newList headerTitle: 'Instance Variable Name Suggestions'.
@@ -140,4 +162,15 @@ OntoPharoInstanceVariableUI >> replaceConcept: selectedConcept with: selectedSug
 			|selectedInstanceVariable |
 			selectedInstanceVariable := instanceVariablePresenter  displayValueAt: (instanceVariablePresenter selection selectedIndex).
 			^ selectedInstanceVariable copyReplaceAll: selectedConcept with: selectedSuggestion.   
+]
+
+{ #category : #announcing }
+OntoPharoInstanceVariableUI >> selectClass: selectedClass [
+	"Selects a Class in the UI."
+	
+	aPackage := selectedClass package.
+	aClass := selectedClass.
+	self packages: RPackageOrganizer default packages.
+	self selectPackage: selectedClass package.
+	classListPresenter selectItem: selectedClass
 ]
