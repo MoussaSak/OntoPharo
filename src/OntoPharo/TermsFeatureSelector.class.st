@@ -45,7 +45,7 @@ TermsFeatureSelector >> collectAllConcepts: aPackage [
 	"Return all the concepts from Class names in aPackage."
 	| collection conceptsCollection |
 	collection := Set new.
-	conceptsCollection := self splitAllPackageClassesNames: aPackage.
+	conceptsCollection := self splitAllPackageClassesNames: aPackage name.
 	conceptsCollection
 		do: [ :i | i do: [ :x | collection add: x asString ] ].
 	^ collection

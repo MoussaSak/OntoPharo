@@ -1,3 +1,11 @@
+"
+am a Class responsible on extracting entities (Packages, Classes, Methods)  by context (based on smalltalk naming convention), execute this script to run an example of me:  
+
+tfsc := TermsFeatureSelectorByContext new.
+tfsc context: 'Onto'.
+tfsc packagesClassesByContext.
+
+"
 Class {
 	#name : #TermsFeatureSelectorByContext,
 	#superclass : #TermsFeatureSelector,
@@ -5,84 +13,107 @@ Class {
 		'packagesByContext',
 		'classesByContext',
 		'methodsByContext',
-		'instanceVriablesByContext'
+		'instanceVriablesByContext',
+		'prefix'
 	],
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #api }
+TermsFeatureSelectorByContext >> context: aPrefix [
+	
+	prefix := aPrefix.
+]
+
+{ #category : #initialization }
 TermsFeatureSelectorByContext >> initialize [ 
  super initialize.
  packagesByContext := OrderedCollection new.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #api }
 TermsFeatureSelectorByContext >> packagesByContext [
-	^packagesByContext 
 
-]
-
-{ #category : #'as yet unclassified' }
-TermsFeatureSelectorByContext >> packagesByPrefix: aPrefix [
-
-	^ self systemAllPackagesNames select: [ :packageName | |packagePrefix|
+	^ self systemAllPackages select: [ :aPackage | 
+		|packageName packagePrefix|
+	packageName := aPackage name asString.
 	packagePrefix := (self splitName: packageName ) first.
-	packagePrefix = aPrefix ] .
+	packagePrefix = prefix ] .
 ]
 
-{ #category : #'as yet unclassified' }
-TermsFeatureSelectorByContext >> packagesClassesByContext: prefix [ 
+{ #category : #api }
+TermsFeatureSelectorByContext >> packagesClassesByContext [ 
 
 	"Packages Classes in a given context"
-	|packagesByPrefix|
-	packagesByPrefix := self packagesByPrefix: prefix.
 	
-	classesByContext := packagesByPrefix flatCollect: [ :aPackage|
-		 (self packageAllClassesNames: aPackage). ].
-	^classesByContext
+	classesByContext := (self packagesByContext) flatCollect: [ :aPackage| aPackage classes ].
+	^classesByContext asOrderedCollection 
 ]
 
-{ #category : #'as yet unclassified' }
-TermsFeatureSelectorByContext >> packagesInstanceVariablesByContext: prefix [
-
+{ #category : #api }
+TermsFeatureSelectorByContext >> packagesInstanceVariablesByContext [
 	"Packages Instance variables in a given context"
+
 	| classesByPrefix |
-	classesByPrefix := self packagesClassesByContext: prefix.
-	instanceVriablesByContext := classesByPrefix flatCollect: [ :each | each asClass instVarNames].
+	classesByPrefix := self packagesClassesByContext.
+	instanceVriablesByContext := classesByPrefix
+		flatCollect: [ :each | each instVarNames ].
 	^ instanceVriablesByContext
 ]
 
-{ #category : #'as yet unclassified' }
-TermsFeatureSelectorByContext >> packagesMethodsByContext: prefix [
+{ #category : #api }
+TermsFeatureSelectorByContext >> packagesMethodsByContext [
 
 	"Packages Methods in a given context " 
 	|classesByPrefix|
-	classesByPrefix := self packagesClassesByContext: prefix. 
+	classesByPrefix := self packagesClassesByContext. 
 	methodsByContext := classesByPrefix flatCollect: [ :each|
-		each asClass methods].
+		each methods].
 	^methodsByContext
 ]
 
-{ #category : #'as yet unclassified' }
-TermsFeatureSelectorByContext >> systemAllPackagesByContext [
+{ #category : #sorting }
+TermsFeatureSelectorByContext >> sortedConceptsByHammingDistanceOF: aConcept in: collectionOfPackages [
+	"Sort a Class Concept compared to other classes concepts in a given Package by Hamming distance"
 
-	"get all packages of the same context, based on prefix 'Pharo naming convention' "
-	|prefixes |
-	prefixes := self systemAllPackagesPrefixes asOrderedCollection . 
-	prefixes collect: [ :prefix|
-   packagesByContext add: (self packagesByPrefix: prefix ) asOrderedCollection].
-	^packagesByContext 
+	| aPackageConcepsCollection hammingCollection |
+	aPackageConcepsCollection := collectionOfPackages flatCollect:[:aPackage| self collectAllConcepts: aPackage].
+	hammingCollection := aPackageConcepsCollection
+		reject: [ :anotherConcept | 
+			(anotherConcept sameAs: aConcept )|(aConcept size ~= anotherConcept size)
+			 ] 
+		thenCollect: [ :anotherConcept | 
+					anotherConcept
+						-> 
+							(termsMeasurments hammingDistanceOf: aConcept with: anotherConcept) ].
 
+	^ self sort2DCollection: hammingCollection.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #sorting }
+TermsFeatureSelectorByContext >> sortedConceptsByLevenshteinDistanceOf: aConcept [
+
+	"Sort a Class Concept compared to other classes concepts in a given context by Levenstein distance returning a key/value collection "
+	| aPackageConceptsCollection levenshteinCollection|
+	aPackageConceptsCollection := self packagesByContext flatCollect: [:each| self collectAllConcepts: each].
+	levenshteinCollection := aPackageConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept ) | ((termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) >= 3) ] thenCollect: 
+		 [ :anotherConcept| 
+			anotherConcept
+				->
+					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) 
+				].
+	
+	^ self sort2DCollection: levenshteinCollection.
+]
+
+{ #category : #api }
 TermsFeatureSelectorByContext >> systemAllPackagesNames [
 
  ^self systemAllPackages collect: [:packageName| packageName name asString].
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #api }
 TermsFeatureSelectorByContext >> systemAllPackagesPrefixes [
 	|allPackagesNames |
 	

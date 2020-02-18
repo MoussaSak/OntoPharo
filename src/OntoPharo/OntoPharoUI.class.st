@@ -166,7 +166,7 @@ OntoPharoUI >> extractConcepts [
 	selectedClass 
 	ifNotNil: [ 
 		aClass := selectedClass.
-		tfs splitName: aClass name asString ]
+		tfs splitName: aClass asString ]
 	ifNil:[ #() ] ]
 
 ]
@@ -262,7 +262,7 @@ OntoPharoUI >> proposeSuggestions [
 	^ [ :aConcept | 
 		aPackage 
 		ifNotNil:[
-		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: (aPackage name))
+		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage )
 		collect: #key ]
 		ifNil: [ #() ] ]
 		
