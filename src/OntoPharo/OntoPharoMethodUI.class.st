@@ -31,6 +31,13 @@ OntoPharoMethodUI class >> defaultSpec [
 				add: #methodSuggestionListPresenter ;	
 				add: #methodBigramSuggestionListPresenter;		
 				yourself);
+		add:
+			(SpBoxLayout newHorizontal 
+				add: #checkBoxMethod;
+				add: #checkBoxClass;
+				add: #checkBoxInstanceVar;
+				add: #checkBoxContext;
+				yourself) withConstraints: [ :constraints | constraints height: 30];
 		add: 
 		(SpBoxLayout newHorizontal 
 				add: #questionLabel ;

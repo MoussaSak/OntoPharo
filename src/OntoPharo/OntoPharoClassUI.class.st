@@ -24,6 +24,13 @@ OntoPharoClassUI class >> defaultSpec [
 				yourself);
 		add:
 			(SpBoxLayout newHorizontal 
+				add: #checkBoxMethod;
+				add: #checkBoxClass;
+				add: #checkBoxInstanceVar;
+				add: #checkBoxContext;
+				yourself) withConstraints: [ :constraints | constraints height: 30];		
+		add:
+			(SpBoxLayout newHorizontal 
 				add: #questionLabel ;
 				add: #button;
 				yourself) withConstraints: [ :constraints | constraints height: 30 ];
@@ -69,7 +76,6 @@ OntoPharoClassUI >> connectPresenters [
 		transmitTo: bgramClassSuggestionPresenter 
 		transform: self proposeBigramsSuggestions 
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-		
 	button
 		action: [ self buttonHandler ]
 ]

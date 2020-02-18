@@ -22,7 +22,11 @@ Class {
 		'instanceVariableConceptPresenter',
 		'instanceVariableNameSuggestion',
 		'aClass',
-		'bgramClassSuggestionPresenter'
+		'bgramClassSuggestionPresenter',
+		'checkBoxMethod',
+		'checkBoxClass',
+		'checkBoxInstanceVar',
+		'checkBoxContext'
 	],
 	#classInstVars : [
 		'refresher',
@@ -47,6 +51,13 @@ OntoPharoUI class >> defaultSpec [
 				add: #suggestionPresenter;
 				add: #bgramClassSuggestionPresenter;			
 				yourself);
+		add:
+			(SpBoxLayout newHorizontal 
+				add: #checkBoxMethod;
+				add: #checkBoxClass;
+				add: #checkBoxInstanceVar;
+				add: #checkBoxContext;
+				yourself) withConstraints: [ :constraints | constraints height: 30];
 		add:
 			(SpBoxLayout newHorizontal 
 				add: #questionLabel ;
@@ -112,6 +123,30 @@ OntoPharoUI >> buttonHandler [
 	^ self refactorClassName: selectedClass to: newName
 ]
 
+{ #category : #api }
+OntoPharoUI >> checkBoxHandle: aCheckBox [ 
+	
+		|checkBoxeses|
+	checkBoxeses := OrderedCollection new.
+	checkBoxeses  add:  checkBoxClass; add: checkBoxMethod; add: checkBoxContext; add: 	checkBoxInstanceVar.
+	
+	aCheckBox whenActivatedDo: [ checkBoxeses reject: [:each| each = aCheckBox ] 
+	thenDo:[ :each| 
+		each enabled: false].
+	(aCheckBox = checkBoxMethod)
+	ifTrue: [ OntoPharoMethodUI open. self delete ].
+	(aCheckBox = checkBoxClass)
+	ifTrue: [ OntoPharoClassUI open. self delete ].
+	(aCheckBox = checkBoxContext )
+	ifTrue: [ OntoPharoContextUI open. self delete].
+	(aCheckBox = checkBoxInstanceVar) 
+	ifTrue: [OntoPharoInstanceVariableUI open. self delete ]].
+ 	
+	aCheckBox whenDeactivatedDo: [checkBoxeses reject: [:each| each = aCheckBox ] 
+	thenDo:[ :each| each enabled: true]].
+
+]
+
 { #category : #accessing }
 OntoPharoUI >> classes: aList [
 
@@ -142,6 +177,10 @@ OntoPharoUI >> connectPresenters [
 		transform: self proposeBigramsSuggestions 
 		postTransmission: [ :destination | destination selectIndex: 1 ].
 		
+	self checkBoxHandle: checkBoxMethod.
+	self checkBoxHandle: checkBoxClass.
+	self checkBoxHandle: checkBoxContext.
+	self checkBoxHandle: checkBoxInstanceVar.
 	button
 		action: [ self buttonHandler ]
 ]
@@ -218,6 +257,10 @@ OntoPharoUI >> initializePresenters [
 	conceptListPresenter := self newList headerTitle: 'Class Name Concepts'.
 	suggestionPresenter := self newList headerTitle: 'Class Name Suggestions'.
 	bgramClassSuggestionPresenter := self newList headerTitle: 'Class Name Bgram Suggestions'.
+	checkBoxMethod := self newCheckBox label: 'OntoPharo Methods Names'.
+	checkBoxClass := self newCheckBox label: 'OntoPharo Classes Names'.
+	checkBoxInstanceVar := self newCheckBox label: 'OntoPharo InstanceVariables Names'.
+	checkBoxContext := self newCheckBox label: 'OntoPharo Context'. 
 	questionLabel := self newLabel label: 'Do you want to apply the suggestion ?!'.
 	button := self newButton label: 'Apply Suggestion'.
 	

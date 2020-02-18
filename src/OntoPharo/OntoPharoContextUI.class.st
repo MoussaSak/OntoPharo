@@ -35,6 +35,13 @@ OntoPharoContextUI class >> defaultSpec [
 				yourself);
 		add:
 			(SpBoxLayout newHorizontal 
+				add: #checkBoxMethod;
+				add: #checkBoxClass;
+				add: #checkBoxInstanceVar;
+				add: #checkBoxContext;
+				yourself) withConstraints: [ :constraints | constraints height: 30];
+		add:
+			(SpBoxLayout newHorizontal 
 				add: #questionLabel ;
 				add: #button;
 				yourself) withConstraints: [ :constraints | constraints height: 30 ];
@@ -181,7 +188,9 @@ OntoPharoContextUI >> initializePresenter [
 	classesByContextBigramSuggestionListPresenter := self newList headerTitle: 'Classes Names Concepts'.
 	
 	methodsByContextListPresenter  := self newList headerTitle: 'Methods by Context'.
-	instanceVariablesByContextListPresenter := self newList headerTitle: 'Instance Variables by Context'
+	instanceVariablesByContextListPresenter := self newList headerTitle: 'Instance Variables by Context'.
+
+
 ]
 
 { #category : #api }
