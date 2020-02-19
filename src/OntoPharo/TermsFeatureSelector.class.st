@@ -35,9 +35,9 @@ TermsFeatureSelector >> classAllMethodsNames: aClass [
 TermsFeatureSelector >> classInstanceVariables: aClass [
 	"get all Instance Variables Names from a Class"
 
-	allInstanceVariables := aClass instVarNames asOrderedCollection
+	allInstanceVariables := (aClass instVarNames )
 		collect: [ :instanceName | instanceName asString ] .
-	^ allInstanceVariables 
+	^ allInstanceVariables asOrderedCollection
 ]
 
 { #category : #sorting }
@@ -70,7 +70,7 @@ TermsFeatureSelector >> nameToBigrams: aName [
 TermsFeatureSelector >> packageAllClassesNames: aPackageName [
 	"get all classes Names from a Package Name"
 	
-	allClassesNames := (RPackageOrganizer default packageNamed: aPackageName) definedClassNames.
+	allClassesNames := aPackageName asPackage definedClassNames.
 	^ allClassesNames asOrderedCollection
 ]
 
@@ -82,7 +82,7 @@ TermsFeatureSelector >> packageAllClassesNamesAsBigrams: aPackageName [
 			:aClassName | self nameToBigrams: aClassName
 		 ].
 	
-	^ classesAsBigrams asOrderedCollection flatCollect: [:ngram| ngram  ]
+	^ classesAsBigrams flatCollect: [:ngram| ngram  ]
 ]
 
 { #category : #'n-grams' }

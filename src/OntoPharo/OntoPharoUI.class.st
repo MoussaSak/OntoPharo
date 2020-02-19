@@ -26,13 +26,14 @@ Class {
 		'checkBoxMethod',
 		'checkBoxClass',
 		'checkBoxInstanceVar',
-		'checkBoxContext'
+		'checkBoxContext',
+		'checkBoxMain'
 	],
 	#classInstVars : [
 		'refresher',
 		'instance'
 	],
-	#category : #'OntoPharo-UI'
+	#category : #'OntoPharo-Spec-UI'
 }
 
 { #category : #specs }
@@ -57,6 +58,7 @@ OntoPharoUI class >> defaultSpec [
 				add: #checkBoxClass;
 				add: #checkBoxInstanceVar;
 				add: #checkBoxContext;
+				add: #checkBoxMain;
 				yourself) withConstraints: [ :constraints | constraints height: 30];
 		add:
 			(SpBoxLayout newHorizontal 
@@ -112,14 +114,13 @@ OntoPharoUI class >> title [
 { #category : #api }
 OntoPharoUI >> buttonHandler [
 	"handels the button work"
-	| newName selectedSuggestion selectedConcept selectedClass |
-	selectedConcept := self getSelectedConcept.
-	selectedSuggestion := self getSelectedSuggestion.
+	| newName selectedClass |
+	
 	selectedClass := classListPresenter
 		displayValueAt: classListPresenter selection selectedIndex.
 	newName := self
-		replaceConcept: selectedConcept
-		with: selectedSuggestion.
+		replaceConcept: self getSelectedConcept
+		with: self getSelectedSuggestion.
 	^ self refactorClassName: selectedClass to: newName
 ]
 
@@ -128,11 +129,10 @@ OntoPharoUI >> checkBoxHandle: aCheckBox [
 	
 		|checkBoxeses|
 	checkBoxeses := OrderedCollection new.
-	checkBoxeses  add:  checkBoxClass; add: checkBoxMethod; add: checkBoxContext; add: 	checkBoxInstanceVar.
+	checkBoxeses  add:  checkBoxClass; add: checkBoxMethod; add: checkBoxContext; add: 	checkBoxInstanceVar; add: checkBoxMain.
 	
 	aCheckBox whenActivatedDo: [ checkBoxeses reject: [:each| each = aCheckBox ] 
-	thenDo:[ :each| 
-		each enabled: false].
+	thenDo:[ :each| each enabled: false].
 	(aCheckBox = checkBoxMethod)
 	ifTrue: [ OntoPharoMethodUI open. self delete ].
 	(aCheckBox = checkBoxClass)
@@ -140,7 +140,9 @@ OntoPharoUI >> checkBoxHandle: aCheckBox [
 	(aCheckBox = checkBoxContext )
 	ifTrue: [ OntoPharoContextUI open. self delete].
 	(aCheckBox = checkBoxInstanceVar) 
-	ifTrue: [OntoPharoInstanceVariableUI open. self delete ]].
+	ifTrue: [OntoPharoInstanceVariableUI open. self delete].
+	(aCheckBox = checkBoxMain) 
+	ifTrue: [OntoPharoUI open. self delete]].
  	
 	aCheckBox whenDeactivatedDo: [checkBoxeses reject: [:each| each = aCheckBox ] 
 	thenDo:[ :each| each enabled: true]].
@@ -261,6 +263,7 @@ OntoPharoUI >> initializePresenters [
 	checkBoxClass := self newCheckBox label: 'OntoPharo Classes Names'.
 	checkBoxInstanceVar := self newCheckBox label: 'OntoPharo InstanceVariables Names'.
 	checkBoxContext := self newCheckBox label: 'OntoPharo Context'. 
+	checkBoxMain := self newCheckBox label: 'OntoPharo'.
 	questionLabel := self newLabel label: 'Do you want to apply the suggestion ?!'.
 	button := self newButton label: 'Apply Suggestion'.
 	
@@ -277,7 +280,6 @@ OntoPharoUI >> initializePresenters [
 OntoPharoUI >> packages: aList [
 	
 	packageListPresenter items = aList
-	
 		ifTrue: [ ^ self ].
 	packageListPresenter
 		items: ((aList collect: ([:aPackagee| aPackagee name asString])) sorted ) ;

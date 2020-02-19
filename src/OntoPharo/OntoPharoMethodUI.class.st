@@ -15,7 +15,7 @@ Class {
 		'methodSuggestionListPresenter',
 		'methodBigramSuggestionListPresenter'
 	],
-	#category : #'OntoPharo-UI'
+	#category : #'OntoPharo-Spec-UI'
 }
 
 { #category : #specs }
@@ -37,6 +37,7 @@ OntoPharoMethodUI class >> defaultSpec [
 				add: #checkBoxClass;
 				add: #checkBoxInstanceVar;
 				add: #checkBoxContext;
+				add: #checkBoxMain;
 				yourself) withConstraints: [ :constraints | constraints height: 30];
 		add: 
 		(SpBoxLayout newHorizontal 

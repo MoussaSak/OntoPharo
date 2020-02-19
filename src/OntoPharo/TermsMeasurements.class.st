@@ -26,6 +26,7 @@ TermsMeasurements >> hammingDistanceOf: aWord with: anotherWord [
 	1 to: (aWord contents size max: anotherWord contents size) do: [ :pos | 
 		(aWord contents at: pos) ~= (anotherWord contents at: pos)
 			ifTrue: [ distance := distance + 1 ] ].
+		
 	^ distance
 ]
 

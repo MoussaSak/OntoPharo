@@ -6,7 +6,7 @@ OntoPharo for Class name suggestions execute
 Class {
 	#name : #OntoPharoClassUI,
 	#superclass : #OntoPharoUI,
-	#category : #'OntoPharo-UI'
+	#category : #'OntoPharo-Spec-UI'
 }
 
 { #category : #specs }
@@ -28,6 +28,7 @@ OntoPharoClassUI class >> defaultSpec [
 				add: #checkBoxClass;
 				add: #checkBoxInstanceVar;
 				add: #checkBoxContext;
+				add: #checkBoxMain;
 				yourself) withConstraints: [ :constraints | constraints height: 30];		
 		add:
 			(SpBoxLayout newHorizontal 
