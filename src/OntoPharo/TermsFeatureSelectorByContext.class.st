@@ -14,7 +14,8 @@ Class {
 		'classesByContext',
 		'methodsByContext',
 		'instanceVriablesByContext',
-		'prefix'
+		'prefix',
+		'aPackageConceptsCollection'
 	],
 	#category : #'OntoPharo-Name-Filtrer'
 }
@@ -29,6 +30,7 @@ TermsFeatureSelectorByContext >> context: aPrefix [
 TermsFeatureSelectorByContext >> initialize [ 
  super initialize.
  packagesByContext := OrderedCollection new.
+ aPackageConceptsCollection := self packagesByContext flatCollect: [:each| self collectAllConcepts: each].
 ]
 
 { #category : #api }
@@ -46,7 +48,8 @@ TermsFeatureSelectorByContext >> packagesClassesByContext [
 
 	"Packages Classes in a given context"
 	
-	classesByContext := (self packagesByContext) flatCollect: [ :aPackage| aPackage classes ].
+	classesByContext := self packagesByContext flatCollect: [ :aPackage| aPackage classes ].
+	aPackageConceptsCollection := self packagesByContext flatCollect: [:each| self collectAllConcepts: each].
 	^classesByContext asOrderedCollection 
 ]
 
@@ -69,7 +72,7 @@ TermsFeatureSelectorByContext >> packagesMethodsByContext [
 	classesByPrefix := self packagesClassesByContext. 
 	methodsByContext := classesByPrefix flatCollect: [ :each|
 		each methods].
-	^methodsByContext
+	^methodsByContext collect:[:each| each name withoutPrefix: (each methodClass name asString), '>>#']
 ]
 
 { #category : #sorting }
@@ -94,15 +97,15 @@ TermsFeatureSelectorByContext >> sortedConceptsByHammingDistanceOF: aConcept in:
 TermsFeatureSelectorByContext >> sortedConceptsByLevenshteinDistanceOf: aConcept [
 
 	"Sort a Class Concept compared to other classes concepts in a given context by Levenstein distance returning a key/value collection "
-	| aPackageConceptsCollection levenshteinCollection|
-	aPackageConceptsCollection := self packagesByContext flatCollect: [:each| self collectAllConcepts: each].
-	levenshteinCollection := aPackageConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept ) | ((termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) >= 3) ] thenCollect: 
+	|  levenshteinCollection|
+	
+	
+	levenshteinCollection := aPackageConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept ) 	| ((termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) >= 3) ] thenCollect: 
 		 [ :anotherConcept| 
 			anotherConcept
 				->
 					(termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) 
 				].
-	
 	^ self sort2DCollection: levenshteinCollection.
 ]
 

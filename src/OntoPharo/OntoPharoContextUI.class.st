@@ -146,9 +146,7 @@ OntoPharoContextUI >> extractMethods [
 		ifNotNil:[
 		aPackageName := selectedClass package packageName asString.
 		tfsc context: (tfs splitName: aPackageName) first.
-		tfsc packagesMethodsByContext collect:[:each|
-			 each name withoutPrefix: (each methodClass name asString), '>>#'
-			].]	
+		tfsc packagesMethodsByContext .]	
 		ifNil: [ #() ] ]
 ]
 
@@ -187,11 +185,10 @@ OntoPharoContextUI >> initializePresenter [
 	classesByContextConceptListPresenter := self newList headerTitle: 'Classes Names Concepts'.
 	classesByContextSuggestionListPresenter := self newList headerTitle: 'Classes Names Concepts'.
 	classesByContextBigramSuggestionListPresenter := self newList headerTitle: 'Classes Names Concepts'.
-	
 	methodsByContextListPresenter  := self newList headerTitle: 'Methods by Context'.
 	instanceVariablesByContextListPresenter := self newList headerTitle: 'Instance Variables by Context'.
-
-
+	
+	
 ]
 
 { #category : #api }
@@ -207,7 +204,7 @@ OntoPharoContextUI >> proposeSuggestions [
 		
 ]
 
-{ #category : #api }
+{ #category : #announcing }
 OntoPharoContextUI >> selectClass: selectedClass [
 	"Selects a Class in the UI."
 	aPackage := selectedClass package.

@@ -134,15 +134,16 @@ OntoPharoUI >> checkBoxHandle: aCheckBox [
 	aCheckBox whenActivatedDo: [ checkBoxeses reject: [:each| each = aCheckBox ] 
 	thenDo:[ :each| each enabled: false].
 	(aCheckBox = checkBoxMethod)
-	ifTrue: [ OntoPharoMethodUI open. self delete ].
+	ifTrue: [ OntoPharoMethodUI open].
 	(aCheckBox = checkBoxClass)
-	ifTrue: [ OntoPharoClassUI open. self delete ].
+	ifTrue: [ OntoPharoClassUI open ].
 	(aCheckBox = checkBoxContext )
-	ifTrue: [ OntoPharoContextUI open. self delete].
+	ifTrue: [ OntoPharoContextUI open].
 	(aCheckBox = checkBoxInstanceVar) 
-	ifTrue: [OntoPharoInstanceVariableUI open. self delete].
+	ifTrue: [OntoPharoInstanceVariableUI open].
 	(aCheckBox = checkBoxMain) 
 	ifTrue: [OntoPharoUI open. self delete]].
+
  	
 	aCheckBox whenDeactivatedDo: [checkBoxeses reject: [:each| each = aCheckBox ] 
 	thenDo:[ :each| each enabled: true]].

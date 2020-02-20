@@ -25,34 +25,30 @@ BaselineOfOntoPharo >> baseline: spec [
 
 { #category : #'as yet unclassified' }
 BaselineOfOntoPharo >> loadIdentifierNameSplitter: spec [
-	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
 		spec
 			baseline: 'IdentifierNameSplitter'
-			with: [ spec repository: 'github://olekscode/IdentifierNameSplitter/src' ] ]
+			with: [ spec repository: 'github://olekscode/IdentifierNameSplitter/src' ] 
 ]
 
 { #category : #'as yet unclassified' }
 BaselineOfOntoPharo >> loadNeoCSV: spec [
-	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
 		spec
 			baseline: 'NeoCSV'
-			with: [ spec repository: 'github://svenvc/NeoCSV/repository' ] ]
+			with: [ spec repository: 'github://svenvc/NeoCSV/repository' ] 
 ]
 
 { #category : #'as yet unclassified' }
 BaselineOfOntoPharo >> loadNgram: spec [
-	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
 		spec
 			baseline: 'Ngram'
-			with: [ spec repository: 'github://PharoAI/Ngram/src' ] ]
+			with: [ spec repository: 'github://PharoAI/Ngram/src' ] 
 ]
 
 { #category : #'as yet unclassified' }
 BaselineOfOntoPharo >> loadPolyglot: spec [
-	spec for: #( #'pharo7.x' #'pharo8.x' ) do: [
 		spec
 			baseline: 'Polyglot'
-			with: [ spec repository: 'github://PolyMathOrg/Polyglot/src' ] ]
+			with: [ spec repository: 'github://PolyMathOrg/Polyglot/src' ] 
 ]
 
 { #category : #baselines }
