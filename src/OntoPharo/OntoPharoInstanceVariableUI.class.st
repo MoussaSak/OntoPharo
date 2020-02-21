@@ -95,11 +95,14 @@ OntoPharoInstanceVariableUI >> connectPresenters [
 	instanceVariableConceptPresenter
 	transmitTo: instanceVariableNameSuggestion
 	transform: self proposeInstancVariableSuggestions  
-	postTransmission: [ :destination | destination selectIndex: 1].
+	postTransmission: [ :destination | destination selectIndex: 1.
+		destination whenSelectionChangedDo: [instanceVariableNameBigramSuggestions resetSelection]].
 	instanceVariableConceptPresenter
 	transmitTo: instanceVariableNameBigramSuggestions 
 	transform: self proposeInstancVariableBigramSuggestions  
-	postTransmission: [ :destination | destination selectIndex: 1].
+	postTransmission: [ :destination | destination .
+		destination whenSelectionChangedDo: [ instanceVariableNameSuggestion resetSelection]
+		].
 	
 	button
 		action: [ self buttonHandler]
@@ -124,8 +127,11 @@ OntoPharoInstanceVariableUI >> getSelectedConcept [
 { #category : #api }
 OntoPharoInstanceVariableUI >> getSelectedSuggestion [
 
-	^ instanceVariableNameSuggestion 
-		displayValueAt: instanceVariableNameSuggestion  selection selectedIndex
+	instanceVariableNameSuggestion  selection selectedIndex ~= 0
+	ifTrue:[^ instanceVariableNameSuggestion 
+		displayValueAt: instanceVariableNameSuggestion  selection selectedIndex].	
+	^instanceVariableNameBigramSuggestions displayValueAt: 
+	instanceVariableNameBigramSuggestions selection selectedIndex.
 ]
 
 { #category : #initialization }

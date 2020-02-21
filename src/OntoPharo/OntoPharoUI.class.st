@@ -163,10 +163,10 @@ OntoPharoUI >> classes: aList [
 { #category : #initialization }
 OntoPharoUI >> connectPresenters [
 	super connectPresenters.
-	packageListPresenter	
+	packageListPresenter
 		transmitTo: classListPresenter
 		transform: self extractClasses
-		postTransmission: [ :destination | destination selectIndex: 1 ]. 	
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 	classListPresenter
 		transmitTo: conceptListPresenter
 		transform: self extractConcepts
@@ -174,18 +174,22 @@ OntoPharoUI >> connectPresenters [
 	conceptListPresenter
 		transmitTo: suggestionPresenter
 		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ] .
-	conceptListPresenter 
-		transmitTo: bgramClassSuggestionPresenter 
-		transform: self proposeBigramsSuggestions 
-		postTransmission: [ :destination | destination selectIndex: 1 ].
-		
+		postTransmission: [ :destination | 
+			destination selectIndex: 1.
+			destination
+				whenSelectionChangedDo: [ bgramClassSuggestionPresenter unselectAll ] ].
+	conceptListPresenter
+		transmitTo: bgramClassSuggestionPresenter
+		transform: self proposeBigramsSuggestions
+		postTransmission: [ :destination | 
+			destination.
+			destination
+				whenSelectionChangedDo: [ suggestionPresenter unselectAll ] ].
 	self checkBoxHandle: checkBoxMethod.
 	self checkBoxHandle: checkBoxClass.
 	self checkBoxHandle: checkBoxContext.
 	self checkBoxHandle: checkBoxInstanceVar.
-	button
-		action: [ self buttonHandler ]
+	button action: [ self buttonHandler ]
 ]
 
 { #category : #api }
@@ -243,8 +247,12 @@ OntoPharoUI >> getSelectedConcept [
 { #category : #api }
 OntoPharoUI >> getSelectedSuggestion [
 	"get the selected suggestion from the suggestionPreseneter"
-	^ suggestionPresenter
-		displayValueAt: suggestionPresenter selection selectedIndex
+	
+	suggestionPresenter selection selectedIndex ~= 0
+	ifTrue:[^ suggestionPresenter
+		displayValueAt: suggestionPresenter selection selectedIndex].
+	^bgramClassSuggestionPresenter
+	displayValueAt: bgramClassSuggestionPresenter selection selectedIndex.
 ]
 
 { #category : #initialization }

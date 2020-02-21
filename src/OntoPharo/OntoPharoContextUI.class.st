@@ -73,33 +73,49 @@ OntoPharoContextUI class >> title [
 	^'OntoPharoContextUI'
 ]
 
+{ #category : #api }
+OntoPharoContextUI >> buttonHandler [
+	"handels the Button Work"
+
+	| newName selectedClassName selectedConcept selectedSuggestion |
+	selectedClassName := classesByContextListPresenter
+		displayValueAt: classesByContextListPresenter selection selectedIndex.
+	selectedConcept := self getSelectedConcept.
+	selectedSuggestion := self getSelectedSuggestion.
+	newName := self
+		replaceConcept: selectedConcept
+		with: selectedSuggestion.
+	self refactorClassName: selectedClassName to: newName
+]
+
 { #category : #initialization }
 OntoPharoContextUI >> connectPresenters [
-
 	super connectPresenters.
-	
-	packageListPresenter  
-		transmitTo: packagesByContextListPresenter 
-		transform: self extractPackagesByContext 
-		postTransmission: [ :destination | destination selectIndex: 1].
-	packagesByContextListPresenter 
-		transmitTo: classesByContextListPresenter 
-		transform: self extractClasses 
-		postTransmission: [ :destination | destination selectIndex: 1].
- 	classesByContextListPresenter
+	packageListPresenter
+		transmitTo: packagesByContextListPresenter
+		transform: self extractPackagesByContext
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	packagesByContextListPresenter
+		transmitTo: classesByContextListPresenter
+		transform: self extractClasses
+		postTransmission: [ :destination | destination selectIndex: 1 ].
+	classesByContextListPresenter
 		transmitTo: classesByContextConceptListPresenter
 		transform: self extractConcepts
-		postTransmission: [ :destination | destination selectIndex: 1 ].	
-	classesByContextConceptListPresenter
-		transmitTo: classesByContextSuggestionListPresenter 
-		transform: self proposeSuggestions
-		postTransmission: [ :destination | destination selectIndex: 1 ] .
-	classesByContextConceptListPresenter 
-		transmitTo: classesByContextBigramSuggestionListPresenter  
-		transform: self proposeBigramsSuggestions 
 		postTransmission: [ :destination | destination selectIndex: 1 ].
-	button
-		action: [ self buttonHandler]
+	classesByContextConceptListPresenter
+		transmitTo: classesByContextSuggestionListPresenter
+		transform: self proposeSuggestions
+		postTransmission: [ :destination | destination selectIndex: 1.
+	destination whenSelectionChangedDo: [ classesByContextBigramSuggestionListPresenter resetListSelection]
+	].
+	classesByContextConceptListPresenter
+		transmitTo: classesByContextBigramSuggestionListPresenter
+		transform: self proposeBigramsSuggestions
+		postTransmission: [ :destination | destination.
+	destination whenSelectionChangedDo:[classesByContextSuggestionListPresenter resetListSelection ]
+			 ].
+	button action: [ self buttonHandler ]
 ]
 
 { #category : #api }
@@ -170,9 +186,12 @@ OntoPharoContextUI >> getSelectedConcept [
 
 { #category : #api }
 OntoPharoContextUI >> getSelectedSuggestion [
-
-	^ classesByContextSuggestionListPresenter 
-		displayValueAt: classesByContextSuggestionListPresenter  selection selectedIndex
+	 
+	(classesByContextSuggestionListPresenter selection selectedIndex )~= 0
+	ifTrue:[ ^classesByContextSuggestionListPresenter 
+		displayValueAt: classesByContextSuggestionListPresenter selection selectedIndex.].
+	^classesByContextBigramSuggestionListPresenter 
+		displayValueAt: classesByContextBigramSuggestionListPresenter selection selectedIndex
 ]
 
 { #category : #initialization }
@@ -183,8 +202,8 @@ OntoPharoContextUI >> initializePresenter [
 	packagesByContextListPresenter := self newList headerTitle: 'Packages by Context'.
 	classesByContextListPresenter  := self newList headerTitle: 'Classes by Context'.
 	classesByContextConceptListPresenter := self newList headerTitle: 'Classes Names Concepts'.
-	classesByContextSuggestionListPresenter := self newList headerTitle: 'Classes Names Concepts'.
-	classesByContextBigramSuggestionListPresenter := self newList headerTitle: 'Classes Names Concepts'.
+	classesByContextSuggestionListPresenter := self newList headerTitle: 'Classes Names Suggestion'.
+	classesByContextBigramSuggestionListPresenter := self newList headerTitle: 'Classes Names Bigram Suggestions'.
 	methodsByContextListPresenter  := self newList headerTitle: 'Methods by Context'.
 	instanceVariablesByContextListPresenter := self newList headerTitle: 'Instance Variables by Context'.
 	

@@ -85,28 +85,29 @@ OntoPharoMethodUI >> buttonHandler [
 
 { #category : #initialization }
 OntoPharoMethodUI >> connectPresenters [
-
 	super connectPresenters.
-	
 	classListPresenter
-	transmitTo: methodListPresenter
-	transform: self extractMethods
-	postTransmission: [ :destination | destination selectIndex: 1 ].
+		transmitTo: methodListPresenter
+		transform: self extractMethods
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 	methodListPresenter
-	transmitTo: methodConceptListPresenter 
-	transform: self extractMethodConcepts
-	postTransmission: [ :destination | destination selectIndex: 1].
+		transmitTo: methodConceptListPresenter
+		transform: self extractMethodConcepts
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 	methodConceptListPresenter
-	transmitTo: methodSuggestionListPresenter
-	transform: self proposeMethodSuggestions
-	postTransmission: [ :destination | destination selectIndex: 1].
+		transmitTo: methodSuggestionListPresenter
+		transform: self proposeMethodSuggestions
+		postTransmission: [ :destination | 
+			destination selectIndex: 1.
+			destination
+				whenSelectionChangedDo: [ methodBigramSuggestionListPresenter unselectAll ] ].
 	methodConceptListPresenter
-	transmitTo: methodBigramSuggestionListPresenter 
-	transform: self proposeMethodBigramsSuggestions 
-	postTransmission: [ :destination | destination selectIndex: 1].
-	
-	button
-		action: [ self buttonHandler]
+		transmitTo: methodBigramSuggestionListPresenter
+		transform: self proposeMethodBigramsSuggestions
+		postTransmission: [ :destination | destination.
+			destination
+				whenSelectionChangedDo: [ methodSuggestionListPresenter unselectAll ] ].
+	button action: [ self buttonHandler ]
 ]
 
 { #category : #api }
@@ -129,8 +130,11 @@ OntoPharoMethodUI >> getSelectedConcept [
 { #category : #api }
 OntoPharoMethodUI >> getSelectedSuggestion [
 
-	^ methodSuggestionListPresenter
-		displayValueAt: methodSuggestionListPresenter selection selectedIndex
+	methodSuggestionListPresenter selection selectedIndex ~= 0
+	ifTrue:[^ methodSuggestionListPresenter
+		displayValueAt: methodSuggestionListPresenter selection selectedIndex].
+	^methodBigramSuggestionListPresenter displayValueAt: 
+	methodBigramSuggestionListPresenter selection selectedItem.
 ]
 
 { #category : #initialization }
