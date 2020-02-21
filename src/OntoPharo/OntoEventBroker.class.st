@@ -25,7 +25,7 @@ OntoEventBroker >> handleClassAdded: anEvent [
 
 { #category : #initialization }
 OntoEventBroker >> handleClassModified: anEvent [
-
+	
 	ui do: [:each | each selectPackage: anEvent packageAffected].
 	ui do: [:each | each selectClass:  anEvent classAffected ].
 ]

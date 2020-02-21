@@ -160,6 +160,7 @@ TermsFeatureSelector >> splitAllSystemClassesNames [
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> splitName: aClassName [
 	^aClassName splitIdentifierName
+
 ]
 
 { #category : #'classes and packages' }

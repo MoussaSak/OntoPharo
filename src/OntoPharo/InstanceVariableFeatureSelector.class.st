@@ -65,7 +65,7 @@ InstanceVariableFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConce
 	
 	| aPackageIVConceptsCollection levenshteinCollection|
 	aPackageIVConceptsCollection := self collectAllInstanceVariablesConcepts: aPackage.
-	levenshteinCollection := aPackageIVConceptsCollection reject: [:anotherConcept| (anotherConcept = aConcept )] thenCollect: 
+	levenshteinCollection := aPackageIVConceptsCollection reject: [:anotherConcept| (anotherConcept = aConcept ) | ((termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) >= 3)] thenCollect: 
 		 [ :anotherConcept| 
 			anotherConcept
 				->

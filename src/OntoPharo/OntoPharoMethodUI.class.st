@@ -74,11 +74,11 @@ OntoPharoMethodUI class >> title [
 OntoPharoMethodUI >> buttonHandler [
 	"handels the Button Work"
 
-	| newName selectedConcept selectedSuggestion |
-	selectedConcept := self getSelectedConcept.
+	| newName selectedConceptIndex selectedSuggestion |
+	selectedConceptIndex := self getSelectedConceptIndex.
 	selectedSuggestion := self getSelectedSuggestion.
 	newName := self
-		replaceConcept: selectedConcept
+		replaceConcept: selectedConceptIndex
 		with: selectedSuggestion.
 	self refactorMethodName: methodName to: newName
 ]
@@ -125,6 +125,11 @@ OntoPharoMethodUI >> extractMethodConcepts [
 OntoPharoMethodUI >> getSelectedConcept [
 	^ methodConceptListPresenter
 		displayValueAt: methodConceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoMethodUI >> getSelectedConceptIndex [
+	^ methodConceptListPresenter selection selectedIndex
 ]
 
 { #category : #api }
@@ -176,12 +181,16 @@ OntoPharoMethodUI >> refactorMethodName: aMethodName to: aNewName [
 ]
 
 { #category : #refactoring }
-OntoPharoMethodUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
+OntoPharoMethodUI >> replaceConcept: selectedConceptIndex with: selectedSuggestion [ 
 
 		"This method replaces the selected concept in the tables with the selected suggestion"
-			|selectedMethod |
+			|selectedMethod collectionWithSuggestion newName|
+			newName := ''.
 			selectedMethod := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
-			^ selectedMethod copyReplaceAll: selectedConcept with: selectedSuggestion.   
+			
+			collectionWithSuggestion := (methodTFS splitName: selectedMethod) at:selectedConceptIndex put: selectedSuggestion ; yourself.
+			collectionWithSuggestion do:[:each| newName become: newName,each ].		
+			^ newName
 ]
 
 { #category : #announcing }

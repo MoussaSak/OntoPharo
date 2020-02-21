@@ -77,13 +77,13 @@ OntoPharoContextUI class >> title [
 OntoPharoContextUI >> buttonHandler [
 	"handels the Button Work"
 
-	| newName selectedClassName selectedConcept selectedSuggestion |
+	| newName selectedClassName selectedConceptIndex selectedSuggestion |
 	selectedClassName := classesByContextListPresenter
 		displayValueAt: classesByContextListPresenter selection selectedIndex.
-	selectedConcept := self getSelectedConcept.
+	selectedConceptIndex := self getSelectedConceptIndex.
 	selectedSuggestion := self getSelectedSuggestion.
 	newName := self
-		replaceConcept: selectedConcept
+		replaceConcept: selectedConceptIndex
 		with: selectedSuggestion.
 	self refactorClassName: selectedClassName to: newName
 ]
@@ -182,6 +182,11 @@ OntoPharoContextUI >> extractPackagesByContext [
 OntoPharoContextUI >> getSelectedConcept [
 	^ classesByContextConceptListPresenter 
 		displayValueAt: classesByContextConceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoContextUI >> getSelectedConceptIndex [
+	^ classesByContextConceptListPresenter selection selectedIndex
 ]
 
 { #category : #api }

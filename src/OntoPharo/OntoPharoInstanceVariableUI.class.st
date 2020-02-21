@@ -22,6 +22,7 @@ OntoPharoInstanceVariableUI class >> defaultSpec [
 	
 		add:
 			(SpBoxLayout newHorizontal 
+				add: #classListPresenter ;
 				add: #instanceVariablePresenter;
 				add: #instanceVariableConceptPresenter;
 				add: #instanceVariableNameSuggestion;
@@ -71,41 +72,41 @@ OntoPharoInstanceVariableUI class >> title [
 OntoPharoInstanceVariableUI >> buttonHandler [
 	"handels the Button Work"
 
-	| newName selectedConcept selectedSuggestion |
-	selectedConcept := self getSelectedConcept.
+	| newName selectedConceptIndex selectedSuggestion |
+	selectedConceptIndex := self getSelectedConceptIndex.
 	selectedSuggestion := self getSelectedSuggestion.
 	newName := self
-		replaceConcept: selectedConcept
+		replaceConcept: selectedConceptIndex
 		with: selectedSuggestion.
 	self refactorInstanceVariableName: instanceVariableName  to: newName
 ]
 
 { #category : #initialization }
 OntoPharoInstanceVariableUI >> connectPresenters [
-
 	super connectPresenters.
 	classListPresenter
-	transmitTo: instanceVariablePresenter
-	transform: self extractInstanceVariables
-	postTransmission: [ :destination | destination selectIndex: 1 ].	
+		transmitTo: instanceVariablePresenter
+		transform: self extractInstanceVariables
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 	instanceVariablePresenter
-	transmitTo: instanceVariableConceptPresenter
-	transform: self extractInstanceVariableConcepts 
-	postTransmission: [ :destination | destination selectIndex: 1].
+		transmitTo: instanceVariableConceptPresenter
+		transform: self extractInstanceVariableConcepts
+		postTransmission: [ :destination | destination selectIndex: 1 ].
 	instanceVariableConceptPresenter
-	transmitTo: instanceVariableNameSuggestion
-	transform: self proposeInstancVariableSuggestions  
-	postTransmission: [ :destination | destination selectIndex: 1.
-		destination whenSelectionChangedDo: [instanceVariableNameBigramSuggestions resetSelection]].
+		transmitTo: instanceVariableNameSuggestion
+		transform: self proposeInstancVariableSuggestions
+		postTransmission: [ :destination | 
+			destination selectIndex: 1.
+			destination
+				whenSelectionChangedDo: [ instanceVariableNameBigramSuggestions unselectAll ] ].
 	instanceVariableConceptPresenter
-	transmitTo: instanceVariableNameBigramSuggestions 
-	transform: self proposeInstancVariableBigramSuggestions  
-	postTransmission: [ :destination | destination .
-		destination whenSelectionChangedDo: [ instanceVariableNameSuggestion resetSelection]
-		].
-	
-	button
-		action: [ self buttonHandler]
+		transmitTo: instanceVariableNameBigramSuggestions
+		transform: self proposeInstancVariableBigramSuggestions
+		postTransmission: [ :destination | 
+			destination.
+			destination
+				whenSelectionChangedDo: [ instanceVariableNameSuggestion unselectAll ] ].
+	button action: [ self buttonHandler ]
 ]
 
 { #category : #api }
@@ -122,6 +123,11 @@ OntoPharoInstanceVariableUI >> extractInstanceVariableConcepts [
 OntoPharoInstanceVariableUI >> getSelectedConcept [
 	^ instanceVariableConceptPresenter 
 		displayValueAt: instanceVariableConceptPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoInstanceVariableUI >> getSelectedConceptIndex [
+	^ instanceVariableConceptPresenter selection selectedIndex
 ]
 
 { #category : #api }
@@ -170,12 +176,17 @@ OntoPharoInstanceVariableUI >> refactorInstanceVariableName: anInstanceName to: 
 ]
 
 { #category : #refactoring }
-OntoPharoInstanceVariableUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
+OntoPharoInstanceVariableUI >> replaceConcept: selectedConceptIndex with: selectedSuggestion [ 
 
 		"This method replaces the selected concept in the tables with the selected suggestion"
-			|selectedInstanceVariable |
+			|selectedInstanceVariable collectionWithSuggestion newName |
+			newName := ''.
 			selectedInstanceVariable := instanceVariablePresenter  displayValueAt: (instanceVariablePresenter selection selectedIndex).
-			^ selectedInstanceVariable copyReplaceAll: selectedConcept with: selectedSuggestion.   
+			selectedInstanceVariable := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
+			collectionWithSuggestion := (instanceVariableTFS splitName: selectedInstanceVariable) 			at:selectedConceptIndex put: selectedSuggestion ; yourself.
+			collectionWithSuggestion do:[:each| newName become: newName,each ].		
+			^ newName
+			
 ]
 
 { #category : #announcing }
@@ -186,5 +197,6 @@ OntoPharoInstanceVariableUI >> selectClass: selectedClass [
 	aClass := selectedClass.
 	self packages: RPackageOrganizer default packages.
 	self selectPackage: selectedClass package.
-	classListPresenter selectItem: selectedClass
+	classListPresenter selectItem: selectedClass.
+	
 ]

@@ -119,7 +119,7 @@ OntoPharoUI >> buttonHandler [
 	selectedClass := classListPresenter
 		displayValueAt: classListPresenter selection selectedIndex.
 	newName := self
-		replaceConcept: self getSelectedConcept
+		replaceConcept: self getSelectedConceptIndex
 		with: self getSelectedSuggestion.
 	^ self refactorClassName: selectedClass to: newName
 ]
@@ -245,6 +245,13 @@ OntoPharoUI >> getSelectedConcept [
 ]
 
 { #category : #api }
+OntoPharoUI >> getSelectedConceptIndex [
+	"Get the selected Concept fril the conceptListPrenter"
+	^ conceptListPresenter
+		displayValueAt: conceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
 OntoPharoUI >> getSelectedSuggestion [
 	"get the selected suggestion from the suggestionPreseneter"
 	
@@ -331,12 +338,16 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 ]
 
 { #category : #refactoring }
-OntoPharoUI >> replaceConcept: selectedConcept with: selectedSuggestion [ 
+OntoPharoUI >> replaceConcept: selectedConceptIndex with: selectedSuggestion [ 
 
 	"This method replaces the selected concept in the tables with the selected suggestion"
-	| selectedClass |
-	selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).
-	^ selectedClass  copyReplaceAll: selectedConcept with: selectedSuggestion.   
+	| selectedClass collectionWithSuggestion newName|
+	newName := ''.
+	selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).	
+			collectionWithSuggestion := (tfs splitName: selectedClass) at: selectedConceptIndex put: selectedSuggestion ; yourself.
+			collectionWithSuggestion do:[:each| newName become: newName,each ].		
+			^ newName
+	
 ]
 
 { #category : #announcing }

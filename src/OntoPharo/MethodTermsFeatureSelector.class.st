@@ -67,7 +67,7 @@ MethodTermsFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in
 
 	| aPackageMethodConceptsCollection levenshteinCollection|
 	aPackageMethodConceptsCollection := self collectAllMethodConcepts: aPackage.
-	levenshteinCollection := aPackageMethodConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept )] thenCollect: 
+	levenshteinCollection := aPackageMethodConceptsCollection reject: [:anotherConcept| (anotherConcept sameAs: aConcept )| ((termsMeasurments levenshteinDistanceOf: aConcept with: anotherConcept) >= 3)] thenCollect: 
 		 [ :anotherConcept| 
 			anotherConcept
 				->
