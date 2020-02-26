@@ -80,8 +80,8 @@ OntoPharoContextUI >> buttonHandler [
 	| newName selectedClassName selectedConceptIndex selectedSuggestion |
 	selectedClassName := classesByContextListPresenter
 		displayValueAt: classesByContextListPresenter selection selectedIndex.
-	selectedConceptIndex := self getSelectedConceptIndex.
-	selectedSuggestion := self getSelectedSuggestion.
+	selectedConceptIndex := self selectedConceptIndex.
+	selectedSuggestion := self selectedSuggestion.
 	newName := self
 		replaceConcept: selectedConceptIndex
 		with: selectedSuggestion.
@@ -178,27 +178,6 @@ OntoPharoContextUI >> extractPackagesByContext [
 		ifNil: [ #() ] ]
 ]
 
-{ #category : #api }
-OntoPharoContextUI >> getSelectedConcept [
-	^ classesByContextConceptListPresenter 
-		displayValueAt: classesByContextConceptListPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoContextUI >> getSelectedConceptIndex [
-	^ classesByContextConceptListPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoContextUI >> getSelectedSuggestion [
-	 
-	(classesByContextSuggestionListPresenter selection selectedIndex )~= 0
-	ifTrue:[ ^classesByContextSuggestionListPresenter 
-		displayValueAt: classesByContextSuggestionListPresenter selection selectedIndex.].
-	^classesByContextBigramSuggestionListPresenter 
-		displayValueAt: classesByContextBigramSuggestionListPresenter selection selectedIndex
-]
-
 { #category : #initialization }
 OntoPharoContextUI >> initializePresenter [
 
@@ -237,4 +216,25 @@ OntoPharoContextUI >> selectClass: selectedClass [
 	self selectPackage: selectedClass package.
 	classesByContextListPresenter selectItem: selectedClass.
 	
+]
+
+{ #category : #api }
+OntoPharoContextUI >> selectedConcept [
+	^ classesByContextConceptListPresenter 
+		displayValueAt: classesByContextConceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoContextUI >> selectedConceptIndex [
+	^ classesByContextConceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoContextUI >> selectedSuggestion [
+	 
+	(classesByContextSuggestionListPresenter selection selectedIndex )~= 0
+	ifTrue:[ ^classesByContextSuggestionListPresenter 
+		displayValueAt: classesByContextSuggestionListPresenter selection selectedIndex.].
+	^classesByContextBigramSuggestionListPresenter 
+		displayValueAt: classesByContextBigramSuggestionListPresenter selection selectedIndex
 ]

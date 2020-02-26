@@ -119,8 +119,8 @@ OntoPharoUI >> buttonHandler [
 	selectedClass := classListPresenter
 		displayValueAt: classListPresenter selection selectedIndex.
 	newName := self
-		replaceConcept: self getSelectedConceptIndex
-		with: self getSelectedSuggestion.
+		replaceConcept: self selectedConceptIndex
+		with: self selectedSuggestion.
 	^ self refactorClassName: selectedClass to: newName
 ]
 
@@ -237,31 +237,6 @@ OntoPharoUI >> extractMethods [
 		ifNil: [ #() ] ]
 ]
 
-{ #category : #api }
-OntoPharoUI >> getSelectedConcept [
-	"Get the selected Concept fril the conceptListPrenter"
-	^ conceptListPresenter
-		displayValueAt: conceptListPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoUI >> getSelectedConceptIndex [
-	"Get the selected Concept fril the conceptListPrenter"
-	^ conceptListPresenter
-		displayValueAt: conceptListPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoUI >> getSelectedSuggestion [
-	"get the selected suggestion from the suggestionPreseneter"
-	
-	suggestionPresenter selection selectedIndex ~= 0
-	ifTrue:[^ suggestionPresenter
-		displayValueAt: suggestionPresenter selection selectedIndex].
-	^bgramClassSuggestionPresenter
-	displayValueAt: bgramClassSuggestionPresenter selection selectedIndex.
-]
-
 { #category : #initialization }
 OntoPharoUI >> initializePresenters [
 
@@ -305,11 +280,16 @@ OntoPharoUI >> packages: aList [
 { #category : #api }
 OntoPharoUI >> proposeBigramsSuggestions [
 	"Propose Bigrams suggestions for Classes Names"
-	^ [ :aConcept | 
+	^ [ :aConcept | |bgramCollection|
 		aPackage 
 		ifNotNil:[
-		(tfs proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
-		(index history last, index last)]]
+		bgramCollection:= (tfs proposeBigrams: aConcept in: (aPackage name)) "collect: [ :index|
+		(index history last, index last)].".
+		bgramCollection collect: [ :concept| 
+			self replaceConcept: (self selectedConceptIndex) with: (concept history last).
+			self replaceConcept: (self selectedConceptIndex + 1) with: (concept  last)
+			]
+		]
 		ifNil:[#()]
 		]
 		
@@ -320,11 +300,13 @@ OntoPharoUI >> proposeBigramsSuggestions [
 { #category : #api }
 OntoPharoUI >> proposeSuggestions [
 	"Propose class Name suggestion based on the other classes concepts names"
-	^ [ :aConcept | 
+	^ [ :aConcept | |levenshteinCollection|
 		aPackage 
 		ifNotNil:[
-		(tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage )
-		collect: #key ]
+		levenshteinCollection := (tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage )
+		collect: #key.
+ 	 	levenshteinCollection collect: [ :concept| self replaceConcept: (self selectedConceptIndex) with: concept  ]
+		]
 		ifNil: [ #() ] ]
 		
 	
@@ -341,12 +323,12 @@ OntoPharoUI >> refactorClassName: aClassNamed to: newName [
 OntoPharoUI >> replaceConcept: selectedConceptIndex with: selectedSuggestion [ 
 
 	"This method replaces the selected concept in the tables with the selected suggestion"
-	| selectedClass collectionWithSuggestion newName|
-	newName := ''.
+	| selectedClass collectionWithSuggestion |
 	selectedClass := classListPresenter  displayValueAt: (classListPresenter selection selectedIndex).	
-			collectionWithSuggestion := (tfs splitName: selectedClass) at: selectedConceptIndex put: selectedSuggestion ; yourself.
-			collectionWithSuggestion do:[:each| newName become: newName,each ].		
-			^ newName
+	collectionWithSuggestion := (tfs splitName: selectedClass) at: selectedConceptIndex put: selectedSuggestion ; yourself.
+	^String streamContents: [:s | 
+	collectionWithSuggestion do: [:each | s nextPutAll: each asString]]	
+	
 	
 ]
 
@@ -377,4 +359,28 @@ OntoPharoUI >> selectPackage: selectedPackage [
 	
 	packageListPresenter selectItem: selectedPackage packageName.
 
+]
+
+{ #category : #api }
+OntoPharoUI >> selectedConcept [
+	"Get the selected Concept fril the conceptListPrenter"
+	^ conceptListPresenter
+		displayValueAt: conceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoUI >> selectedConceptIndex [
+	"Get the selected Concept fril the conceptListPrenter"
+	^ conceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoUI >> selectedSuggestion [
+	"get the selected suggestion from the suggestionPreseneter"
+	
+	suggestionPresenter selection selectedIndex ~= 0
+	ifTrue:[^ suggestionPresenter
+		displayValueAt: suggestionPresenter selection selectedIndex].
+	^bgramClassSuggestionPresenter
+	displayValueAt: bgramClassSuggestionPresenter selection selectedIndex.
 ]

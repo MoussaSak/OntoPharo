@@ -75,8 +75,8 @@ OntoPharoMethodUI >> buttonHandler [
 	"handels the Button Work"
 
 	| newName selectedConceptIndex selectedSuggestion |
-	selectedConceptIndex := self getSelectedConceptIndex.
-	selectedSuggestion := self getSelectedSuggestion.
+	selectedConceptIndex := self selectedConceptIndex.
+	selectedSuggestion := self selectedSuggestion.
 	newName := self
 		replaceConcept: selectedConceptIndex
 		with: selectedSuggestion.
@@ -121,27 +121,6 @@ OntoPharoMethodUI >> extractMethodConcepts [
 	 ]
 ]
 
-{ #category : #api }
-OntoPharoMethodUI >> getSelectedConcept [
-	^ methodConceptListPresenter
-		displayValueAt: methodConceptListPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoMethodUI >> getSelectedConceptIndex [
-	^ methodConceptListPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoMethodUI >> getSelectedSuggestion [
-
-	methodSuggestionListPresenter selection selectedIndex ~= 0
-	ifTrue:[^ methodSuggestionListPresenter
-		displayValueAt: methodSuggestionListPresenter selection selectedIndex].
-	^methodBigramSuggestionListPresenter displayValueAt: 
-	methodBigramSuggestionListPresenter selection selectedItem.
-]
-
 { #category : #initialization }
 OntoPharoMethodUI >> initializePresenter [
 
@@ -184,13 +163,13 @@ OntoPharoMethodUI >> refactorMethodName: aMethodName to: aNewName [
 OntoPharoMethodUI >> replaceConcept: selectedConceptIndex with: selectedSuggestion [ 
 
 		"This method replaces the selected concept in the tables with the selected suggestion"
-			|selectedMethod collectionWithSuggestion newName|
-			newName := ''.
+			|selectedMethod collectionWithSuggestion |
+			
 			selectedMethod := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
 			
 			collectionWithSuggestion := (methodTFS splitName: selectedMethod) at:selectedConceptIndex put: selectedSuggestion ; yourself.
-			collectionWithSuggestion do:[:each| newName become: newName,each ].		
-			^ newName
+			^String streamContents: [:s | 
+			collectionWithSuggestion do: [:each | s nextPutAll: each asString]]	
 ]
 
 { #category : #announcing }
@@ -206,4 +185,25 @@ OntoPharoMethodUI >> selectMethod: aMethod [
 	aMethodName := aMethod name withoutPrefix: (aMethod methodClass name asString), '>>#'.
 	methodListPresenter selectItem: aMethodName
 	
+]
+
+{ #category : #api }
+OntoPharoMethodUI >> selectedConcept [
+	^ methodConceptListPresenter
+		displayValueAt: methodConceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoMethodUI >> selectedConceptIndex [
+	^ methodConceptListPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoMethodUI >> selectedSuggestion [
+
+	methodSuggestionListPresenter selection selectedIndex ~= 0
+	ifTrue:[^ methodSuggestionListPresenter
+		displayValueAt: methodSuggestionListPresenter selection selectedIndex].
+	^methodBigramSuggestionListPresenter displayValueAt: 
+	methodBigramSuggestionListPresenter selection selectedItem.
 ]

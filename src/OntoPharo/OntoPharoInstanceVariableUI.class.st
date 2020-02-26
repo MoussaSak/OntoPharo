@@ -73,8 +73,8 @@ OntoPharoInstanceVariableUI >> buttonHandler [
 	"handels the Button Work"
 
 	| newName selectedConceptIndex selectedSuggestion |
-	selectedConceptIndex := self getSelectedConceptIndex.
-	selectedSuggestion := self getSelectedSuggestion.
+	selectedConceptIndex := self selectedConceptIndex.
+	selectedSuggestion := self selectedSuggestion.
 	newName := self
 		replaceConcept: selectedConceptIndex
 		with: selectedSuggestion.
@@ -119,27 +119,6 @@ OntoPharoInstanceVariableUI >> extractInstanceVariableConcepts [
 		ifNil: [ #() ] ]
 ]
 
-{ #category : #api }
-OntoPharoInstanceVariableUI >> getSelectedConcept [
-	^ instanceVariableConceptPresenter 
-		displayValueAt: instanceVariableConceptPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoInstanceVariableUI >> getSelectedConceptIndex [
-	^ instanceVariableConceptPresenter selection selectedIndex
-]
-
-{ #category : #api }
-OntoPharoInstanceVariableUI >> getSelectedSuggestion [
-
-	instanceVariableNameSuggestion  selection selectedIndex ~= 0
-	ifTrue:[^ instanceVariableNameSuggestion 
-		displayValueAt: instanceVariableNameSuggestion  selection selectedIndex].	
-	^instanceVariableNameBigramSuggestions displayValueAt: 
-	instanceVariableNameBigramSuggestions selection selectedIndex.
-]
-
 { #category : #initialization }
 OntoPharoInstanceVariableUI >> initializePresenters [ 
 
@@ -179,14 +158,13 @@ OntoPharoInstanceVariableUI >> refactorInstanceVariableName: anInstanceName to: 
 OntoPharoInstanceVariableUI >> replaceConcept: selectedConceptIndex with: selectedSuggestion [ 
 
 		"This method replaces the selected concept in the tables with the selected suggestion"
-			|selectedInstanceVariable collectionWithSuggestion newName |
-			newName := ''.
+			|selectedInstanceVariable collectionWithSuggestion |
+			
 			selectedInstanceVariable := instanceVariablePresenter  displayValueAt: (instanceVariablePresenter selection selectedIndex).
 			selectedInstanceVariable := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
-			collectionWithSuggestion := (instanceVariableTFS splitName: selectedInstanceVariable) 			at:selectedConceptIndex put: selectedSuggestion ; yourself.
-			collectionWithSuggestion do:[:each| newName become: newName,each ].		
-			^ newName
-			
+			collectionWithSuggestion := (instanceVariableTFS splitName: selectedInstanceVariable) 	at:selectedConceptIndex put: selectedSuggestion ; yourself.
+			^String streamContents: [:s | 
+			collectionWithSuggestion do: [:each | s nextPutAll: each asString]]	
 ]
 
 { #category : #announcing }
@@ -199,4 +177,25 @@ OntoPharoInstanceVariableUI >> selectClass: selectedClass [
 	self selectPackage: selectedClass package.
 	classListPresenter selectItem: selectedClass.
 	
+]
+
+{ #category : #api }
+OntoPharoInstanceVariableUI >> selectedConcept [
+	^ instanceVariableConceptPresenter 
+		displayValueAt: instanceVariableConceptPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoInstanceVariableUI >> selectedConceptIndex [
+	^ instanceVariableConceptPresenter selection selectedIndex
+]
+
+{ #category : #api }
+OntoPharoInstanceVariableUI >> selectedSuggestion [
+
+	instanceVariableNameSuggestion  selection selectedIndex ~= 0
+	ifTrue:[^ instanceVariableNameSuggestion 
+		displayValueAt: instanceVariableNameSuggestion  selection selectedIndex].	
+	^instanceVariableNameBigramSuggestions displayValueAt: 
+	instanceVariableNameBigramSuggestions selection selectedIndex.
 ]
