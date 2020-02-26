@@ -5,18 +5,39 @@ Class {
 	#name : #TermsMeasurements,
 	#superclass : #Object,
 	#instVars : [
-		'levenshteinDistance',
-		'hummingDistance',
-		'phonetix',
-		'tfidf'
+		'tfidf',
+		'tfsc'
 	],
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
 { #category : #unused }
-TermsMeasurements >> getConceptTFIDF: aConcept in: aDocument [
+TermsMeasurements >> conceptTFIDF: aConcept in: aPackageName [
+	"Concept Term Frequency-inverseDocumentFrequencyOf (TF-IDF) in a context:
+		- The training corpus will be all the concepts in the given package context.
+		- The package concepts will be the source of the TF"
+
+	| document |
+	self trainOn: aPackageName.
+	document := (tfsc splitAllPackageClassesNames: aPackageName)
+		flatCollect: [ :concept | concept ].
+	^ aConcept -> (tfidf scoreOf: aConcept in: document)
+]
+
+{ #category : #unused }
+TermsMeasurements >> conceptsTFIDFs: aPackageName [
+	"Concepts Term Frequency-inverseDocumentFrequencyOf (TF-IDFs) in a context:
+		- The training corpus will be all the concepts in the given package context (packages with the same prefix).
+		- The package concepts will be the source of the TF"
+		
+	|document conceptsWithTFIDF |
+	self trainOn: aPackageName.
+	document := ((tfsc splitAllPackageClassesNames: aPackageName) flatCollect: [:concept| concept]) asSet.
+	conceptsWithTFIDF := document collect: [ :aConcept|
+		aConcept -> (tfidf scoreOf: aConcept in: document)
+		 ].
+	^  self sort2DCollection: conceptsWithTFIDF
 	
-	^ tfidf scoreOf: aConcept in: aDocument
 ]
 
 { #category : #distance }
@@ -33,6 +54,7 @@ TermsMeasurements >> hammingDistanceOf: aWord with: anotherWord [
 TermsMeasurements >> initialize [ 
 
 	tfidf := PGTermFrequencyInverseDocumentFrequency new.
+	
 ]
 
 { #category : #'as yet unclassified' }
@@ -65,20 +87,26 @@ TermsMeasurements >> levenshteinDistanceOf: aWord with: anotherWord [
 	^ stab at: stab rowCount at: stab columnCount
 ]
 
+{ #category : #unused }
+TermsMeasurements >> sort2DCollection: a2DCollection [
+	"Descending Sorting  for Key/Value Collection"
+	|sorted|
+	sorted := SortedCollection sortBlock: [ :a :b | a value > b value ].
+	sorted addAll: a2DCollection.
+	^ sorted
+]
+
 { #category : #sorting }
 TermsMeasurements >> sortConceptsByTFIDF: aCollection [
 	^ aCollection asSortedCollection 
 ]
 
 { #category : #unused }
-TermsMeasurements >> suggestConceptNames: aConcept in: aPackage [
-	self trainOn: (self splitAllPackageClassesNames: aPackage).
-	^ self
-		getConceptTFIDF: aConcept
-		in: (('A Test from the first example' splitOn: ' ') asArray) 
-]
-
-{ #category : #unused }
-TermsMeasurements >> trainOn: aPackageConcepts [
-	tfidf trainOn: aPackageConcepts
+TermsMeasurements >> trainOn: aPackageName [
+	|prefix |
+	tfsc := TermsFeatureSelectorByContext new.
+	prefix := aPackageName splitIdentifierName first.
+	tfsc context: prefix.
+	tfidf trainOn: tfsc packagesConceptsByContext.
+	^ tfsc
 ]

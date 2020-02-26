@@ -30,7 +30,8 @@ TermsFeatureSelectorByContext >> context: aPrefix [
 TermsFeatureSelectorByContext >> initialize [ 
  super initialize.
  packagesByContext := OrderedCollection new.
- aPackageConceptsCollection := self packagesByContext flatCollect: [:each| self collectAllConcepts: each].
+ aPackageConceptsCollection := self packagesConceptsByContext flatCollect: [:aConcept| aConcept].
+
 ]
 
 { #category : #api }
@@ -44,13 +45,18 @@ TermsFeatureSelectorByContext >> packagesByContext [
 ]
 
 { #category : #api }
-TermsFeatureSelectorByContext >> packagesClassesByContext [ 
-
+TermsFeatureSelectorByContext >> packagesClassesByContext [
 	"Packages Classes in a given context"
-	
-	classesByContext := self packagesByContext flatCollect: [ :aPackage| aPackage classes ].
-	aPackageConceptsCollection := self packagesByContext flatCollect: [:each| self collectAllConcepts: each].
-	^classesByContext asOrderedCollection 
+
+	classesByContext := self packagesByContext
+		flatCollect: [ :aPackage | aPackage classes ].
+	^ classesByContext asOrderedCollection
+]
+
+{ #category : #api }
+TermsFeatureSelectorByContext >> packagesConceptsByContext [
+	^ self packagesByContext
+		collect: [ :each | self collectAllConcepts: each ]
 ]
 
 { #category : #api }
