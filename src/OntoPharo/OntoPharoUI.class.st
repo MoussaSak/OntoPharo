@@ -283,12 +283,19 @@ OntoPharoUI >> proposeBigramsSuggestions [
 	^ [ :aConcept | |bgramCollection|
 		aPackage 
 		ifNotNil:[
-		bgramCollection:= (tfs proposeBigrams: aConcept in: (aPackage name)) "collect: [ :index|
-		(index history last, index last)].".
-		bgramCollection collect: [ :concept| 
-			self replaceConcept: (self selectedConceptIndex) with: (concept history last).
-			self replaceConcept: (self selectedConceptIndex + 1) with: (concept  last)
+		bgramCollection:= (tfs proposeBigrams: aConcept in: (aPackage name)).
+		(conceptListPresenter items size > 1) 
+		ifTrue:[
+		bgramCollection collect: [ :bgramConcept| 
+				((bgramConcept history last = aConcept) & (self selectedConceptIndex ~= conceptListPresenter items size))
+				ifTrue: [ 
+				self replaceConcept: (self selectedConceptIndex) with: (bgramConcept history last).
+				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept  last)]
+				ifFalse: [ 
+				self replaceConcept: (self selectedConceptIndex)  with: (bgramConcept last).
+				self replaceConcept: (self selectedConceptIndex - 1) with: (bgramConcept history last)]]
 			]
+		ifFalse:[#()]
 		]
 		ifNil:[#()]
 		]
