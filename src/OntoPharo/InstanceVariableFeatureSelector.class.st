@@ -55,7 +55,7 @@ InstanceVariableFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	bigramsWithOccurence := bigramsCollection
 		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
 		thenCollect: [ :bigram | bigram ].
-	^ self SortedBigrams: bigramsWithOccurence
+	^ self sortedBigrams: bigramsWithOccurence
 ]
 
 { #category : #sorting }

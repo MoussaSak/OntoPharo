@@ -13,15 +13,6 @@ Class {
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
-{ #category : #'n-grams' }
-TermsFeatureSelector >> SortedBigrams: bigramsWithOccurence [
-	| bgramsWithValues |
-	bgramsWithValues := bigramsWithOccurence asBag valuesAndCounts
-		asOrderedDictionary.
-	bgramsWithValues sortAssociations: [ :a :b | a value > b value ].
-	^ bgramsWithValues keys
-]
-
 { #category : #'string-manipulation' }
 TermsFeatureSelector >> classAllMethodsNames: aClass [
 	"get all Methods Names from a Class"
@@ -88,13 +79,40 @@ TermsFeatureSelector >> packageAllClassesNamesAsBigrams: aPackageName [
 { #category : #'n-grams' }
 TermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	"Sort a Class Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
-
 	| bigramsCollection bigramsWithOccurence |
 	bigramsCollection := self packageAllClassesNamesAsBigrams: aPackage.
 	bigramsWithOccurence := bigramsCollection
 		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
 		thenCollect: [ :bigram | bigram ].
-	^ self SortedBigrams: bigramsWithOccurence
+	^ self sortedBigrams: bigramsWithOccurence
+]
+
+{ #category : #sorting }
+TermsFeatureSelector >> proposeClassConcepts: aClass [
+
+	"Proposing concepts based on the TF-IDF algorithm:
+		- terms with 0 value are removed from the concepts	
+	"
+	|classConcepts packageConceptsWithTFIDF|	
+	classConcepts := self splitName: aClass name.
+	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: aClass package name.
+	
+	^classConcepts reject: [:aConcept| 
+		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 
+		aConcept ]
+
+]
+
+{ #category : #sorting }
+TermsFeatureSelector >> proposePackageConcepts: aPackage [
+	|packageConcepts packageConceptsWithTFIDF|	
+	packageConcepts := self collectAllConcepts: aPackage.
+	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: aPackage name.
+	
+	^packageConcepts reject: [:aConcept| 
+		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 
+		aConcept ]
+
 ]
 
 { #category : #sorting }
@@ -104,6 +122,15 @@ TermsFeatureSelector >> sort2DCollection: a2DCollection [
 	sorted := SortedCollection sortBlock: [ :a :b | a value < b value ].
 	sorted addAll: a2DCollection.
 	^ sorted
+]
+
+{ #category : #'n-grams' }
+TermsFeatureSelector >> sortedBigrams: bigramsWithOccurence [
+	| bgramsWithValues |
+	bgramsWithValues := bigramsWithOccurence asBag valuesAndCounts
+		asOrderedDictionary.
+	bgramsWithValues sortAssociations: [ :a :b | a value > b value ].
+	^ bgramsWithValues keys
 ]
 
 { #category : #sorting }
