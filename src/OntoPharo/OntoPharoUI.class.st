@@ -212,7 +212,8 @@ OntoPharoUI >> extractConcepts [
 	selectedClass 
 	ifNotNil: [ 
 		aClass := selectedClass.
-		tfs proposeClassConcepts: aClass]
+		tfs proposeConcepts: aClass.
+		"tfs proposeConceptsByContext: aClass"]
 	ifNil:[ #() ] ]
 
 ]

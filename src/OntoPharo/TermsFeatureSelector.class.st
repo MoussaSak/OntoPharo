@@ -88,17 +88,32 @@ TermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 ]
 
 { #category : #sorting }
-TermsFeatureSelector >> proposeClassConcepts: aClass [
+TermsFeatureSelector >> proposeConcepts: aClass [
+
+	"Proposing concepts based on the TF-IDF algorithm "
+	|classConcepts packageConceptsWithTFIDF threshold prefix |	
+	threshold := 3.
+	prefix := (self splitName: (aClass package name)) first  .
+	classConcepts := self splitName: aClass name.
+	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: prefix.
+	^classConcepts reject: [:aConcept| 
+		(packageConceptsWithTFIDF at: aConcept) > threshold] thenCollect:[:aConcept| 
+		aConcept ]
+
+]
+
+{ #category : #sorting }
+TermsFeatureSelector >> proposeConceptsByContext: aClass [
 
 	"Proposing concepts based on the TF-IDF algorithm:
-		- terms with 0 value are removed from the concepts	
-	"
-	|classConcepts packageConceptsWithTFIDF|	
+		- terms with 0 value are removed from the concepts"
+	|classConcepts packageConceptsWithTFIDF threshold|	
+	threshold := 0.
 	classConcepts := self splitName: aClass name.
-	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: aClass package name.
+	packageConceptsWithTFIDF :=  termsMeasurments conceptsByContextTFIDF: aClass package name.
 	
 	^classConcepts reject: [:aConcept| 
-		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 
+		(packageConceptsWithTFIDF at: aConcept) = threshold] thenCollect:[:aConcept| 
 		aConcept ]
 
 ]
@@ -107,7 +122,7 @@ TermsFeatureSelector >> proposeClassConcepts: aClass [
 TermsFeatureSelector >> proposePackageConcepts: aPackage [
 	|packageConcepts packageConceptsWithTFIDF|	
 	packageConcepts := self collectAllConcepts: aPackage.
-	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: aPackage name.
+	packageConceptsWithTFIDF :=  termsMeasurments conceptsByContextTFIDF: aPackage name.
 	
 	^packageConcepts reject: [:aConcept| 
 		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 

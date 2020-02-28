@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #api }
-TermsMeasurements >> conceptTFIDF: aConcept in: aPackageName [
+TermsMeasurements >> conceptByContextTFIDF: aConcept in: aPackageName [
 	"Concept Term Frequency-inverseDocumentFrequencyOf (TF-IDF) in a context:
 		- The training corpus will be all the concepts in the given package context.
 		- The package concepts will be the source of the TF"
@@ -25,7 +25,7 @@ TermsMeasurements >> conceptTFIDF: aConcept in: aPackageName [
 ]
 
 { #category : #api }
-TermsMeasurements >> conceptsTFIDF: aPackageName [
+TermsMeasurements >> conceptsByContextTFIDF: aPackageName [
 	"Concepts Term Frequency-inverseDocumentFrequencyOf (TF-IDFs) in a context:
 		- The training corpus will be all the concepts in the given package context (packages with the same prefix).
 		- The package concepts will be the source of the TF"
@@ -34,6 +34,25 @@ TermsMeasurements >> conceptsTFIDF: aPackageName [
 	conceptsWithTFIDF := Dictionary new.
 	self trainOn: aPackageName.
 	document := ((tfsc splitAllPackageClassesNames: aPackageName) flatCollect: [:concept| concept]) asSet.
+	document do: [ :aConcept|
+		conceptsWithTFIDF at: aConcept 
+								put: (tfidf scoreOf: aConcept in: document)
+		 ].
+	^ conceptsWithTFIDF
+	
+]
+
+{ #category : #api }
+TermsMeasurements >> conceptsTFIDF: aContext [
+	"Concepts Term Frequency-inverseDocumentFrequencyOf (TF-IDFs) in all the system context:
+		- The training corpus will be all the system .
+		- package context (packages with the same prefix) will be the source of the TF"
+		
+	|document conceptsWithTFIDF|
+	conceptsWithTFIDF := Dictionary new.
+	self trainOnAllSystem.
+	tfsc context: aContext.
+	document := ((tfsc packagesConceptsByContext) flatCollect: [:concept| concept]) asSet.
 	document do: [ :aConcept|
 		conceptsWithTFIDF at: aConcept 
 								put: (tfidf scoreOf: aConcept in: document)
@@ -124,5 +143,13 @@ TermsMeasurements >> trainOn: aPackageName [
 	prefix := aPackageName splitIdentifierName first.
 	tfsc context: prefix.
 	tfidf trainOn: tfsc packagesConceptsByContext.
+	^ tfsc
+]
+
+{ #category : #api }
+TermsMeasurements >> trainOnAllSystem [
+	
+	tfsc := TermsFeatureSelectorByContext new.
+	tfidf trainOn: tfsc splitAllSystemClassesNames.
 	^ tfsc
 ]
