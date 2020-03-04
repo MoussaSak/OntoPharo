@@ -212,8 +212,7 @@ OntoPharoUI >> extractConcepts [
 	selectedClass 
 	ifNotNil: [ 
 		aClass := selectedClass.
-		tfs proposeConcepts: aClass.
-		"tfs proposeConceptsByContext: aClass"]
+		tfs proposeClassConcepts: aClass]
 	ifNil:[ #() ] ]
 
 ]
@@ -285,21 +284,15 @@ OntoPharoUI >> proposeBigramsSuggestions [
 		aPackage 
 		ifNotNil:[
 		bgramCollection:= (tfs proposeBigrams: aConcept in: (aPackage name)).
-		(conceptListPresenter items size > 1) 
-		ifTrue:[
-		bgramCollection collect: [ :bgramConcept| 
-				((bgramConcept history last = aConcept) & (self selectedConceptIndex ~= conceptListPresenter items size))
-				ifTrue: [ 
+		bgramCollection reject:[:bgramConcept|
+			((bgramConcept history last ~= aConcept) & (self selectedConceptIndex = conceptListPresenter items size))] 
+		thenCollect: [ :bgramConcept| 
 				self replaceConcept: (self selectedConceptIndex) with: (bgramConcept history last).
-				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept  last)]
-				ifFalse: [ 
-				self replaceConcept: (self selectedConceptIndex)  with: (bgramConcept last).
-				self replaceConcept: (self selectedConceptIndex - 1) with: (bgramConcept history last)]]
-			]
-		ifFalse:[#()]
-		]
+				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept last)
+				]]
 		ifNil:[#()]
 		]
+	
 		
 		
 	

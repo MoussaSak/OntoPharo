@@ -82,9 +82,25 @@ TermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	| bigramsCollection bigramsWithOccurence |
 	bigramsCollection := self packageAllClassesNamesAsBigrams: aPackage.
 	bigramsWithOccurence := bigramsCollection
-		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
+		select: [ :bigram | bigram history last = aConcept ]
 		thenCollect: [ :bigram | bigram ].
 	^ self sortedBigrams: bigramsWithOccurence
+]
+
+{ #category : #sorting }
+TermsFeatureSelector >> proposeClassConcepts: aClass [
+
+	"Proposing concepts based on the TF-IDF algorithm:
+		- terms with 0 value are removed from the concepts	
+	"
+	|classConcepts packageConceptsWithTFIDF|	
+	classConcepts := self splitName: aClass name.
+	packageConceptsWithTFIDF :=  termsMeasurments conceptsByContextTFIDF: aClass package name.
+	
+	^classConcepts reject: [:aConcept| 
+		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 
+		aConcept ]
+
 ]
 
 { #category : #sorting }
@@ -93,7 +109,7 @@ TermsFeatureSelector >> proposeConcepts: aClass [
 	"Proposing concepts based on the TF-IDF algorithm "
 	|classConcepts packageConceptsWithTFIDF threshold prefix |	
 	threshold := 3.
-	prefix := (self splitName: (aClass package name)) first  .
+	prefix := (self splitName: (aClass package name)) first .
 	classConcepts := self splitName: aClass name.
 	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: prefix.
 	^classConcepts reject: [:aConcept| 

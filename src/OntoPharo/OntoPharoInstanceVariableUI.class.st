@@ -133,11 +133,17 @@ OntoPharoInstanceVariableUI >> initializePresenters [
 OntoPharoInstanceVariableUI >> proposeInstancVariableBigramSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
 	^ [ :aConcept | 
-		(instanceVariableTFS proposeBigrams: aConcept in: (aPackage name)) collect: [ :index|
-		(index history last, index last)
-		 ]
-		]
-		
+		aConcept
+		ifNotNil:[
+		instanceVariableTFS proposeBigrams: aConcept in: (aPackage name).
+		instanceVariableTFS reject:[:bgramConcept|
+			((bgramConcept history last ~= aConcept) & (self selectedConceptIndex = instanceVariableConceptPresenter items size))] 
+		thenCollect: [ :bgramConcept| 
+				self replaceConcept: (self selectedConceptIndex) with: (bgramConcept history last).
+				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept last)
+				]]
+		ifNil:[#()]
+		].
 ]
 
 { #category : #api }

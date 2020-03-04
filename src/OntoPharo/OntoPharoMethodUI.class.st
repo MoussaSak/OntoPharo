@@ -135,12 +135,20 @@ OntoPharoMethodUI >> initializePresenter [
 { #category : #api }
 OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
-	^ [ :aConcept | 
+	^ [ :aConcept | |bgramCollection |
+		aConcept 
+		ifNotNil: [ 
+		bgramCollection := methodTFS proposeBigrams: aConcept in: (aPackage name).
+		bgramCollection reject:[:bgramConcept|
+			((bgramConcept history last ~= aConcept) & (self selectedConceptIndex = methodConceptListPresenter items size))] 
+		thenCollect: [ :bgramConcept| 
+				self replaceConcept: (self selectedConceptIndex) with: (bgramConcept history last).
+				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept last)
+				]]
+		ifNil:[#()]
+		]
 		
-		aConcept ifNotNil: [ 
-		(methodTFS proposeBigrams: aConcept in: (aPackage name)) 
-			collect: [ :index | index history last, index last ]
-		]ifNil: [ #() ] ].
+	
 ]
 
 { #category : #api }
