@@ -58,6 +58,22 @@ InstanceVariableFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	^ self sortedBigrams: bigramsWithOccurence
 ]
 
+{ #category : #'string-manipulation' }
+InstanceVariableFeatureSelector >> proposeConceptsByContext: aClass [
+
+		"Proposing concepts based on the TF-IDF algorithm:
+		- terms with 0 value are removed from the concepts"
+	|instanceVariablesConcepts packageConceptsWithTFIDF threshold|	
+	threshold := 0.
+	instanceVariablesConcepts := self classInstanceVariables: aClass.
+	packageConceptsWithTFIDF :=  termsMeasurments classConceptsByContextTFIDF: aClass package name.
+	
+	^instanceVariablesConcepts reject: [:aConcept| 
+		(packageConceptsWithTFIDF at: aConcept) = threshold] thenCollect:[:aConcept| 
+		aConcept ]
+
+]
+
 { #category : #sorting }
 InstanceVariableFeatureSelector >> sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage [
 

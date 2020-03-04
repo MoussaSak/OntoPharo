@@ -88,22 +88,6 @@ TermsFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 ]
 
 { #category : #sorting }
-TermsFeatureSelector >> proposeClassConcepts: aClass [
-
-	"Proposing concepts based on the TF-IDF algorithm:
-		- terms with 0 value are removed from the concepts	
-	"
-	|classConcepts packageConceptsWithTFIDF|	
-	classConcepts := self splitName: aClass name.
-	packageConceptsWithTFIDF :=  termsMeasurments conceptsByContextTFIDF: aClass package name.
-	
-	^classConcepts reject: [:aConcept| 
-		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 
-		aConcept ]
-
-]
-
-{ #category : #sorting }
 TermsFeatureSelector >> proposeConcepts: aClass [
 
 	"Proposing concepts based on the TF-IDF algorithm "
@@ -111,7 +95,7 @@ TermsFeatureSelector >> proposeConcepts: aClass [
 	threshold := 3.
 	prefix := (self splitName: (aClass package name)) first .
 	classConcepts := self splitName: aClass name.
-	packageConceptsWithTFIDF :=  termsMeasurments conceptsTFIDF: prefix.
+	packageConceptsWithTFIDF :=  termsMeasurments classConceptsTFIDF: prefix.
 	^classConcepts reject: [:aConcept| 
 		(packageConceptsWithTFIDF at: aConcept) > threshold] thenCollect:[:aConcept| 
 		aConcept ]
@@ -126,7 +110,7 @@ TermsFeatureSelector >> proposeConceptsByContext: aClass [
 	|classConcepts packageConceptsWithTFIDF threshold|	
 	threshold := 0.
 	classConcepts := self splitName: aClass name.
-	packageConceptsWithTFIDF :=  termsMeasurments conceptsByContextTFIDF: aClass package name.
+	packageConceptsWithTFIDF :=  termsMeasurments classConceptsByContextTFIDF: aClass package name.
 	
 	^classConcepts reject: [:aConcept| 
 		(packageConceptsWithTFIDF at: aConcept) = threshold] thenCollect:[:aConcept| 
@@ -138,7 +122,7 @@ TermsFeatureSelector >> proposeConceptsByContext: aClass [
 TermsFeatureSelector >> proposePackageConcepts: aPackage [
 	|packageConcepts packageConceptsWithTFIDF|	
 	packageConcepts := self collectAllConcepts: aPackage.
-	packageConceptsWithTFIDF :=  termsMeasurments conceptsByContextTFIDF: aPackage name.
+	packageConceptsWithTFIDF :=  termsMeasurments classConceptsByContextTFIDF: aPackage name.
 	
 	^packageConcepts reject: [:aConcept| 
 		(packageConceptsWithTFIDF at: aConcept) = 0 ] thenCollect:[:aConcept| 

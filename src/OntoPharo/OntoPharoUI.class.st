@@ -212,7 +212,7 @@ OntoPharoUI >> extractConcepts [
 	selectedClass 
 	ifNotNil: [ 
 		aClass := selectedClass.
-		tfs proposeClassConcepts: aClass]
+		tfs proposeConceptsByContext: aClass]
 	ifNil:[ #() ] ]
 
 ]
@@ -223,7 +223,8 @@ OntoPharoUI >> extractInstanceVariables [
 	^ [ :selectedClass | 
 	selectedClass 
 	ifNotNil: [ 
-	instanceVariableTFS classInstanceVariables: selectedClass ]
+	instanceVariableTFS proposeConceptsByContext: selectedClass.
+	"instanceVariableTFS classInstanceVariables: selectedClass" ]
 	ifNil: [ #() ] ]
 ]
 

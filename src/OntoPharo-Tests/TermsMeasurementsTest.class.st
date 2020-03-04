@@ -24,7 +24,7 @@ TermsMeasurementsTest >> setUp [
 { #category : #test }
 TermsMeasurementsTest >> testGetConceptIDFIn [
 	| idf |
-	idf := tfs conceptByContextTFIDF: 'Test' in: 'This is a document in Test'.
+	idf := tfs classConceptByContextTFIDF: 'Test' in: 'This is a document in Test'.
 	self assert: idf closeTo: 0.
 ]
 

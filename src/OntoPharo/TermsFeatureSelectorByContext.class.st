@@ -66,7 +66,7 @@ TermsFeatureSelectorByContext >> packagesInstanceVariablesByContext [
 	| classesByPrefix |
 	classesByPrefix := self packagesClassesByContext.
 	instanceVriablesByContext := classesByPrefix
-		flatCollect: [ :each | each instVarNames ].
+		flatCollect: [ :each | each instVarNames].
 	^ instanceVriablesByContext
 ]
 

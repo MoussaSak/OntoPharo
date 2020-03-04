@@ -6,34 +6,35 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'tfidf',
-		'tfsc'
+		'tfsc',
+		'instanceVarsFS'
 	],
 	#category : #'OntoPharo-Name-Filtrer'
 }
 
 { #category : #api }
-TermsMeasurements >> conceptByContextTFIDF: aConcept in: aPackageName [
+TermsMeasurements >> classConceptByContextTFIDF: aConcept in: aPackageName [
 	"Concept Term Frequency-inverseDocumentFrequencyOf (TF-IDF) in a context:
 		- The training corpus will be all the concepts in the given package context.
 		- The package concepts will be the source of the TF"
 
 	| document |
-	self trainOn: aPackageName.
+	self trainOnClassesNames: aPackageName.
 	document := (tfsc splitAllPackageClassesNames: aPackageName)
 		flatCollect: [ :concept | concept ].
 	^ aConcept -> (tfidf scoreOf: aConcept in: document)
 ]
 
 { #category : #api }
-TermsMeasurements >> conceptsByContextTFIDF: aPackageName [
+TermsMeasurements >> classConceptsByContextTFIDF: aPackageName [
 	"Concepts Term Frequency-inverseDocumentFrequencyOf (TF-IDFs) in a context:
 		- The training corpus will be all the concepts in the given package context (packages with the same prefix).
 		- The package concepts will be the source of the TF"
-		
 	|document conceptsWithTFIDF |
 	conceptsWithTFIDF := Dictionary new.
-	self trainOn: aPackageName.
+	self trainOnClassesNames: aPackageName.
 	document := ((tfsc splitAllPackageClassesNames: aPackageName) flatCollect: [:concept| concept]) asSet.
+	
 	document do: [ :aConcept|
 		conceptsWithTFIDF at: aConcept 
 								put: (tfidf scoreOf: aConcept in: document)
@@ -43,14 +44,13 @@ TermsMeasurements >> conceptsByContextTFIDF: aPackageName [
 ]
 
 { #category : #api }
-TermsMeasurements >> conceptsTFIDF: aContext [
+TermsMeasurements >> classConceptsTFIDF: aContext [
 	"Concepts Term Frequency-inverseDocumentFrequencyOf (TF-IDFs) in all the system context:
 		- The training corpus will be all the system .
 		- package context (packages with the same prefix) will be the source of the TF"
-		
 	|document conceptsWithTFIDF|
 	conceptsWithTFIDF := Dictionary new.
-	self trainOnAllSystem.
+	self trainOnAllSystemClassesNames.
 	tfsc context: aContext.
 	document := ((tfsc packagesConceptsByContext) flatCollect: [:concept| concept]) asSet.
 	document do: [ :aConcept|
@@ -75,6 +75,23 @@ TermsMeasurements >> hammingDistanceOf: aWord with: anotherWord [
 TermsMeasurements >> initialize [ 
 
 	tfidf := PGTermFrequencyInverseDocumentFrequency new.
+	
+]
+
+{ #category : #api }
+TermsMeasurements >> instVarsConceptsByContextTFIDF: aPackageName [
+	"Concepts Term Frequency-inverseDocumentFrequencyOf (TF-IDFs) in a context:
+		- The training corpus will be all the concepts in the given package context (packages with the same prefix).
+		- The package concepts will be the source of the TF"
+	|document conceptsWithTFIDF |
+	conceptsWithTFIDF := Dictionary new.
+	self trainOnInstanceVars: aPackageName.
+	document := ((instanceVarsFS splitAllPackageInstanceNames: aPackageName) flatCollect: [:concept| concept]) asSet.
+	document do: [ :aConcept|
+		conceptsWithTFIDF at: aConcept 
+								put: (tfidf scoreOf: aConcept in: document)
+		 ].
+	^ conceptsWithTFIDF
 	
 ]
 
@@ -137,7 +154,15 @@ TermsMeasurements >> sortedConceptsTFIDFs: aPackageName [
 ]
 
 { #category : #api }
-TermsMeasurements >> trainOn: aPackageName [
+TermsMeasurements >> trainOnAllSystemClassesNames [
+	
+	tfsc := TermsFeatureSelectorByContext new.
+	tfidf trainOn: tfsc splitAllSystemClassesNames.
+	^ tfsc
+]
+
+{ #category : #api }
+TermsMeasurements >> trainOnClassesNames: aPackageName [
 	|prefix |
 	tfsc := TermsFeatureSelectorByContext new.
 	prefix := aPackageName splitIdentifierName first.
@@ -147,9 +172,13 @@ TermsMeasurements >> trainOn: aPackageName [
 ]
 
 { #category : #api }
-TermsMeasurements >> trainOnAllSystem [
-	
+TermsMeasurements >> trainOnInstanceVars: aPackageName [
+	|prefix instancesByPackage|
 	tfsc := TermsFeatureSelectorByContext new.
-	tfidf trainOn: tfsc splitAllSystemClassesNames.
+	instanceVarsFS := InstanceVariableFeatureSelector new.
+	prefix := aPackageName splitIdentifierName first.
+	tfsc context: prefix.
+	instancesByPackage := (tfsc packagesByContext) collect: [ :p| (p classes) flatCollect: [ :c| c instVarNames]].
+	tfidf trainOn: instancesByPackage.
 	^ tfsc
 ]
