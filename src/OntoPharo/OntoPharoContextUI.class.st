@@ -198,8 +198,7 @@ OntoPharoContextUI >> initializePresenter [
 OntoPharoContextUI >> proposeSuggestions [
 	"Propose class Name suggestion based on the other classes concepts names"
 	^ [ :aConcept |
-		 
-		aPackage 
+		aConcept
 		ifNotNil:[
 		(tfsc sortedConceptsByLevenshteinDistanceOf: aConcept)
 		collect: #key ]

@@ -147,6 +147,7 @@ OntoPharoMethodUI >> proposeMethodBigramsSuggestions [
 				]]
 		ifNil:[#()]
 		]
+	
 		
 	
 ]

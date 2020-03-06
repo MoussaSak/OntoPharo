@@ -19,10 +19,8 @@ OntoPharoInstanceVariableUI class >> defaultSpec [
 	
 	
 	^ SpBoxLayout newVertical
-	
 		add:
 			(SpBoxLayout newHorizontal 
-				add: #classListPresenter ;
 				add: #instanceVariablePresenter;
 				add: #instanceVariableConceptPresenter;
 				add: #instanceVariableNameSuggestion;
@@ -115,7 +113,8 @@ OntoPharoInstanceVariableUI >> extractInstanceVariableConcepts [
 	instanceVariable
 		ifNotNil: [
 			instanceVariableName := instanceVariable.
-			 instanceVariableTFS splitName: instanceVariable ]
+			instanceVariableTFS proposeConceptsByContext: aClass. 
+			"instanceVariableTFS splitName: instanceVariable" ]
 		ifNil: [ #() ] ]
 ]
 
@@ -132,16 +131,20 @@ OntoPharoInstanceVariableUI >> initializePresenters [
 { #category : #api }
 OntoPharoInstanceVariableUI >> proposeInstancVariableBigramSuggestions [
 		"Propose Bigrams suggestions for Classes Names"
-	^ [ :aConcept | 
+	^ [ :aConcept | |bgramCollection |
 		aConcept
 		ifNotNil:[
-		instanceVariableTFS proposeBigrams: aConcept in: (aPackage name).
-		instanceVariableTFS reject:[:bgramConcept|
+			
+		bgramCollection := instanceVariableTFS proposeBigrams: aConcept in: (aPackage name).
+		(self selectedConceptIndex = 0)
+		ifFalse:[
+		bgramCollection reject:[:bgramConcept|
 			((bgramConcept history last ~= aConcept) & (self selectedConceptIndex = instanceVariableConceptPresenter items size))] 
 		thenCollect: [ :bgramConcept| 
 				self replaceConcept: (self selectedConceptIndex) with: (bgramConcept history last).
 				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept last)
 				]]
+		ifTrue:[#()]]
 		ifNil:[#()]
 		].
 ]
@@ -167,10 +170,10 @@ OntoPharoInstanceVariableUI >> replaceConcept: selectedConceptIndex with: select
 			|selectedInstanceVariable collectionWithSuggestion |
 			
 			selectedInstanceVariable := instanceVariablePresenter  displayValueAt: (instanceVariablePresenter selection selectedIndex).
-			selectedInstanceVariable := methodListPresenter displayValueAt: (methodListPresenter selection selectedIndex).
-			collectionWithSuggestion := (instanceVariableTFS splitName: selectedInstanceVariable) 	at:selectedConceptIndex put: selectedSuggestion ; yourself.
+			collectionWithSuggestion := (instanceVariableTFS splitName: selectedInstanceVariable) 	at: selectedConceptIndex put: selectedSuggestion ; yourself.
 			^String streamContents: [:s | 
 			collectionWithSuggestion do: [:each | s nextPutAll: each asString]]	
+		
 ]
 
 { #category : #announcing }

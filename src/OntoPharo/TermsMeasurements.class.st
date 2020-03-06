@@ -174,11 +174,12 @@ TermsMeasurements >> trainOnClassesNames: aPackageName [
 { #category : #api }
 TermsMeasurements >> trainOnInstanceVars: aPackageName [
 	|prefix instancesByPackage|
-	tfsc := TermsFeatureSelectorByContext new.
+	
 	instanceVarsFS := InstanceVariableFeatureSelector new.
+	tfsc := TermsFeatureSelectorByContext new.
 	prefix := aPackageName splitIdentifierName first.
 	tfsc context: prefix.
-	instancesByPackage := (tfsc packagesByContext) collect: [ :p| (p classes) flatCollect: [ :c| c instVarNames]].
+	instancesByPackage := ((tfsc packagesByContext) collect: [ :p| ((instanceVarsFS splitAllPackageInstanceNames: p name) flatCollect: [:c |c ]) asSet]) asSet.
 	tfidf trainOn: instancesByPackage.
 	^ tfsc
 ]

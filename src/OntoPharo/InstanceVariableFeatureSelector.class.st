@@ -49,13 +49,13 @@ InstanceVariableFeatureSelector >> packageAllInatanceVariablesNamesAsBigrams: aP
 { #category : #'n-grams' }
 InstanceVariableFeatureSelector >> proposeBigrams: aConcept in: aPackage [
 	"Sort an Instance variable Concept compared to other classes concepts in a given Package by the number of occurences of bigrams inside the same Package "
-
 	| bigramsCollection bigramsWithOccurence |
 	bigramsCollection := self packageAllInatanceVariablesNamesAsBigrams: aPackage.
 	bigramsWithOccurence := bigramsCollection
 		select: [ :bigram | bigram history last = aConcept | (bigram last = aConcept) ]
 		thenCollect: [ :bigram | bigram ].
 	^ self sortedBigrams: bigramsWithOccurence
+	
 ]
 
 { #category : #'string-manipulation' }
@@ -66,11 +66,11 @@ InstanceVariableFeatureSelector >> proposeConceptsByContext: aClass [
 	|instanceVariablesConcepts packageConceptsWithTFIDF threshold|	
 	threshold := 0.
 	instanceVariablesConcepts := self classInstanceVariables: aClass.
-	packageConceptsWithTFIDF :=  termsMeasurments classConceptsByContextTFIDF: aClass package name.
-	
+	packageConceptsWithTFIDF :=  termsMeasurments instVarsConceptsByContextTFIDF: aClass package name.
 	^instanceVariablesConcepts reject: [:aConcept| 
 		(packageConceptsWithTFIDF at: aConcept) = threshold] thenCollect:[:aConcept| 
 		aConcept ]
+
 
 ]
 

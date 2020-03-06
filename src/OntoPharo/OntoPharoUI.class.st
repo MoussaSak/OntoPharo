@@ -190,6 +190,7 @@ OntoPharoUI >> connectPresenters [
 	self checkBoxHandle: checkBoxContext.
 	self checkBoxHandle: checkBoxInstanceVar.
 	button action: [ self buttonHandler ]
+	
 ]
 
 { #category : #api }
@@ -213,7 +214,7 @@ OntoPharoUI >> extractConcepts [
 	ifNotNil: [ 
 		aClass := selectedClass.
 		tfs proposeConceptsByContext: aClass]
-	ifNil:[ #() ] ]
+	ifNil:[#()]]
 
 ]
 
@@ -223,8 +224,7 @@ OntoPharoUI >> extractInstanceVariables [
 	^ [ :selectedClass | 
 	selectedClass 
 	ifNotNil: [ 
-	instanceVariableTFS proposeConceptsByContext: selectedClass.
-	"instanceVariableTFS classInstanceVariables: selectedClass" ]
+	instanceVariableTFS classInstanceVariables: selectedClass.]	
 	ifNil: [ #() ] ]
 ]
 
@@ -285,12 +285,15 @@ OntoPharoUI >> proposeBigramsSuggestions [
 		aPackage 
 		ifNotNil:[
 		bgramCollection:= (tfs proposeBigrams: aConcept in: (aPackage name)).
+		(self selectedConceptIndex = 0)
+		ifFalse:[
 		bgramCollection reject:[:bgramConcept|
 			((bgramConcept history last ~= aConcept) & (self selectedConceptIndex = conceptListPresenter items size))] 
 		thenCollect: [ :bgramConcept| 
 				self replaceConcept: (self selectedConceptIndex) with: (bgramConcept history last).
 				self replaceConcept: (self selectedConceptIndex + 1) with: (bgramConcept last)
 				]]
+		ifTrue:[#()]]
 		ifNil:[#()]
 		]
 	
@@ -303,13 +306,15 @@ OntoPharoUI >> proposeBigramsSuggestions [
 OntoPharoUI >> proposeSuggestions [
 	"Propose class Name suggestion based on the other classes concepts names"
 	^ [ :aConcept | |levenshteinCollection|
-		aPackage 
+		aConcept 
 		ifNotNil:[
 		levenshteinCollection := (tfs sortedConceptsByLevenshteinDistanceOf: aConcept in: aPackage )
 		collect: #key.
  	 	levenshteinCollection collect: [ :concept| self replaceConcept: (self selectedConceptIndex) with: concept  ]
 		]
 		ifNil: [ #() ] ]
+	
+		
 		
 	
 ]
